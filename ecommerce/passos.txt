@@ -1,0 +1,13 @@
+Passo a passo para criar um CRUD:
+
+1 - Modelo
+2 - Repositoriy
+3 - Service
+4 - Controller
+
+CRUD:
+
+Create = OK
+Read = OK
+Update = OK
+Delete = OK

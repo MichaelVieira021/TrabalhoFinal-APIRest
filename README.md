@@ -34,7 +34,7 @@ Inativar produto
 Inativar uma categoria  
 Tabela de log das alterações e inclusões feitas em produtos e categorias.  
 (id, tipo, data, valorOriginal, valorAtual, idUsuario)  
-Tem que ter tratamento de erro com retorno correto dos statuscode.  
+Tem que ter tratamento de erro com retorno correto dos statuscode.               
 ### Extras:  
 Criar documentação no swagger.  
 Adicionar foto ao produto  

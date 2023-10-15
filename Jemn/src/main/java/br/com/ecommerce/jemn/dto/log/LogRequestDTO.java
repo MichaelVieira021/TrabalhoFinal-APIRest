@@ -1,12 +1,10 @@
 package br.com.ecommerce.jemn.dto.log;
 
-import java.util.Date;
 import br.com.ecommerce.jemn.model.Usuario;
 
 public class LogRequestDTO {
     
     private String tipo; //ENUM
-    private Date data;
     private double vlOriginal;
     private double vlAtual;
     private Usuario usuario;
@@ -17,14 +15,6 @@ public class LogRequestDTO {
 
     public void setTipo(String tipo) {
         this.tipo = tipo;
-    }
-
-    public Date getData() {
-        return data;
-    }
-
-    public void setData(Date data) {
-        this.data = data;
     }
 
     public double getVlOriginal() {

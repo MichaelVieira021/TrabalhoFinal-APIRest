@@ -1,7 +1,6 @@
 package br.com.ecommerce.jemn.model;
 
 import java.util.Date;
-
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -9,7 +8,6 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
-
 import com.fasterxml.jackson.annotation.JsonBackReference;
 
 @Entity
@@ -36,6 +34,10 @@ public class Log {
     @JoinColumn(name = "idUsuario", nullable = false)
     @JsonBackReference
     private Usuario usuario;
+    
+    public Log() {
+    	this.data = new Date();
+    }
 
     public Long getId() {
         return Id;

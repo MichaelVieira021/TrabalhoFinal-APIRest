@@ -4,44 +4,14 @@ import java.util.Date;
 import java.util.List;
 import br.com.ecommerce.jemn.model.PedidoItem;
 
-
 public class PedidoRequestDTO {
-    
-    private double vltotalPedido;  
-    private double descontoPedido; 
-    private double acrescimoPedido;  
+     
     private String obsPedido;
     private String formaPg;
     private List<PedidoItem> pedidoItens;
     private Long idUsuario;
     private Date dtPedido;
     
-   
-
-    public double getVltotalPedido() {
-        return vltotalPedido;
-    }
-
-    public void setVltotalPedido(double vltotalPedido) {
-        this.vltotalPedido = vltotalPedido;
-    }
-
-    public double getDescontoPedido() {
-        return descontoPedido;
-    }
-
-    public void setDescontoPedido(double descontoPedido) {
-        this.descontoPedido = descontoPedido;
-    }
-
-    public double getAcrescimoPedido() {
-        return acrescimoPedido;
-    }
-
-    public void setAcrescimoPedido(double acrescimoPedido) {
-        this.acrescimoPedido = acrescimoPedido;
-    }
-
     public String getObsPedido() {
         return obsPedido;
     }

@@ -42,6 +42,9 @@ public class Usuario {
     @Column
     private int perfil;
 
+    public Usuario() {
+    	this.dtCadastro = new Date();
+    }
     public Long getId() {
         return id;
     }

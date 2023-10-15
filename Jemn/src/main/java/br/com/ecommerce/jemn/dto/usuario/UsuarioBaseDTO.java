@@ -1,13 +1,10 @@
 package br.com.ecommerce.jemn.dto.usuario;
 
-import java.util.Date;
-
 public abstract class UsuarioBaseDTO {
     
     private String nomeUsuario;
     private String email;
     private String telefone;
-    private Date dtCadastro;
     private int perfil; // TOKEN
     
     public String getNomeUsuario() {
@@ -32,14 +29,6 @@ public abstract class UsuarioBaseDTO {
 
     public void setTelefone(String telefone) {
         this.telefone = telefone;
-    }
-
-    public Date getDtCadastro() {
-        return dtCadastro;
-    }
-
-    public void setDtCadastro(Date dtCadastro) {
-        this.dtCadastro = dtCadastro;
     }
 
     public int getPerfil() {

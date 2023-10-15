@@ -1,4 +1,4 @@
-package br.com.ecommerce.Jemn;
+package br.com.ecommerce.jemn;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

@@ -4,8 +4,7 @@ public class CategoriaRequestDTO {
 
     private String nomeCategoria;
     private String obsCategoria;
-
-
+   
     public String getNomeCategoria() {
         return nomeCategoria;
     }
@@ -17,7 +16,7 @@ public class CategoriaRequestDTO {
     public String getObsCategoria() {
         return obsCategoria;
     }
-
+    
     public void setObsCategoria(String obsCategoria) {
         this.obsCategoria = obsCategoria;
     }

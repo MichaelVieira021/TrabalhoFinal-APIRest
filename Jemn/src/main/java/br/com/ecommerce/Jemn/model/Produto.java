@@ -18,7 +18,7 @@ public class Produto {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id_produto")
+    @Column(name = "idProduto")
     private Long id;
 
     @Column(nullable = false, length = 20)
@@ -34,7 +34,7 @@ public class Produto {
     private Integer qtdProduto;
 
     @ManyToOne
-    @JoinColumn(name = "idProduto", nullable = false)
+    @JoinColumn(name = "idCategoria", nullable = false)
     @JsonBackReference
     private Categoria categoria;
 

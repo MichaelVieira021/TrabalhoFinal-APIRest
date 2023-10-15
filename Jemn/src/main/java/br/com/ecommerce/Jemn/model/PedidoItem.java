@@ -5,6 +5,10 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+
+import com.fasterxml.jackson.annotation.JsonBackReference;
 
 @Entity
 public class PedidoItem {
@@ -25,6 +29,16 @@ public class PedidoItem {
 
     @Column(nullable = false)
     private double vltotalItem;
+
+    @ManyToOne
+    @JoinColumn(name = "idProduto", nullable = false)
+    @JsonBackReference
+    private Produto produto;
+
+    @ManyToOne
+    @JoinColumn(name = "idPedido", nullable = false)
+    @JsonBackReference
+    private Pedido pedido;
 
     public Long getId() {
         return id;

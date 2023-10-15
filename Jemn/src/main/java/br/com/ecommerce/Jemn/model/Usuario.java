@@ -1,12 +1,14 @@
 package br.com.ecommerce.jemn.model;
 
 import java.util.Date;
+import java.util.List;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.OneToMany;
 
 @Entity
 public class Usuario {
@@ -30,6 +32,12 @@ public class Usuario {
 
     @Column(nullable = false)
     private Date dtCadastro;
+
+    @OneToMany(mappedBy = "usuario")
+    private List<Pedido> pedidos;
+
+    @OneToMany(mappedBy = "usuario")
+    private List<Log> logs;
 
     @Column
     private int perfil;

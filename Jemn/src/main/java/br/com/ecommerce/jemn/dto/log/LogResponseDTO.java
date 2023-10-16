@@ -4,15 +4,15 @@ import java.util.Date;
 
 public class LogResponseDTO extends LogRequestDTO {
     
-    private Long Id;
+    private Long id;
     private Date data;
 
     public Long getId() {
-        return Id;
+        return id;
     }
 
     public void setId(Long id) {
-        Id = id;
+        this.id = id;
     }
 
 	public Date getData() {

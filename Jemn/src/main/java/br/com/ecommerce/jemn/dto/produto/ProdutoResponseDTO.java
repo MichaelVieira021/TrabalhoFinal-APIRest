@@ -11,5 +11,4 @@ public class ProdutoResponseDTO extends ProdutoRequestDTO {
     public void setId(Long id) {
         this.id = id;
     }
-
 }

@@ -5,6 +5,8 @@ import java.util.List;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -38,7 +40,8 @@ public class Pedido {
     private String obsPedido;
 
     @Column(nullable = false)
-    private String formaPg;
+    @Enumerated(EnumType.STRING)
+    private FormaPagamento formaPg;
 
     @OneToMany(mappedBy = "pedido")
     private List<PedidoItem> pedidoItens;
@@ -47,6 +50,10 @@ public class Pedido {
     @JoinColumn(name = "idUsuario", nullable = false)
     @JsonBackReference
     private Usuario usuario;
+    
+    public Pedido() {
+    	this.dtPedido = new Date();
+    }
 
     public Long getId() {
         return id;
@@ -95,13 +102,15 @@ public class Pedido {
     public void setObsPedido(String obsPedido) {
         this.obsPedido = obsPedido;
     }
+
+	public FormaPagamento getFormaPg() {
+		return formaPg;
+	}
+
+	public void setFormaPg(FormaPagamento formaPg) {
+		this.formaPg = formaPg;
+	}
     
-    public String getFormaPg() {
-        return formaPg;
-    }
     
-    public void setFormaPg(String formaPg) {
-        this.formaPg = formaPg;
-    }
         
 }

@@ -41,7 +41,6 @@ public class Produto {
     @OneToMany(mappedBy = "produto")
     private List<PedidoItem> pedidoItens;
 
-
     public Long getId() {
         return id;
     }
@@ -82,7 +81,14 @@ public class Produto {
         this.qtdProduto = qtdProduto;
     }
 
+	public Categoria getCategoria() {
+		return categoria;
+	}
 
+	public void setCategoria(Categoria categoria) {
+		this.categoria = categoria;
+	}
+    
     
 }
 

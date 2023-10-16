@@ -4,7 +4,7 @@ public class PedidoItemRequestDTO {
     
     private Integer qtdPedidoitem;
     private Long idProduto;
-    private Long idPedido;   
+    private Long idPedido;
 
     public Integer getQtdPedidoitem() {
         return qtdPedidoitem;

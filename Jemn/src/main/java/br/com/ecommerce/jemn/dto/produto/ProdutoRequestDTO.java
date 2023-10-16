@@ -1,21 +1,21 @@
 package br.com.ecommerce.jemn.dto.produto;
 
+import br.com.ecommerce.jemn.model.Categoria;
 
 public class ProdutoRequestDTO {
-
+	
     private String nomeProduto;
     private String obsProduto;
     private double vlProduto;
     private Integer qtdProduto;
-    private Long idCategoria;
+    private Categoria categoria;
     
-    
-    public Long getIdCategoria() {
-        return idCategoria;
+    public Categoria getCategoria() {
+        return categoria;
     }
 
-    public void setIdCategoria(Long idCategoria) {
-        this.idCategoria = idCategoria;
+    public void setCategoria(Categoria idCategoria) {
+        this.categoria = idCategoria;
     }
 
     public String getNomeProduto() {
@@ -49,5 +49,4 @@ public class ProdutoRequestDTO {
     public void setQtdProduto(Integer qtdProduto) {
         this.qtdProduto = qtdProduto;
     }
-
 }

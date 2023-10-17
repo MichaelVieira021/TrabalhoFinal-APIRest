@@ -39,14 +39,14 @@ public class Pedido {
     private String obsPedido;
 
     @Column(nullable = false)
-    @Enumerated(EnumType.STRING)
+    //@Enumerated(EnumType.STRING)
     private FormaPagamento formaPg;
 
     @OneToMany(mappedBy = "pedido")
     private List<PedidoItem> pedidoItens;
 
     @ManyToOne
-    @JoinColumn(name = "idUsuario", nullable = false)
+    @JoinColumn(name = "idUsuario")
     @JsonBackReference
     private Usuario usuario;
     

@@ -12,6 +12,8 @@ import br.com.ecommerce.jemn.dto.pedido.PedidoRequestDTO;
 import br.com.ecommerce.jemn.dto.pedido.PedidoResponseDTO;
 import br.com.ecommerce.jemn.dto.pedidoItem.PedidoItemRequestDTO;
 import br.com.ecommerce.jemn.dto.pedidoItem.PedidoItemResponseDTO;
+import br.com.ecommerce.jemn.dto.produto.ProdutoResponseDTO;
+import br.com.ecommerce.jemn.dto.usuario.UsuarioResponseDTO;
 import br.com.ecommerce.jemn.model.Pedido;
 import br.com.ecommerce.jemn.model.PedidoItem;
 import br.com.ecommerce.jemn.repository.PedidoRepository;
@@ -22,8 +24,11 @@ public class PedidoService {
 	@Autowired
 	private PedidoRepository pedidoRepository;
 	
-	//@Autowired
-	//private UsuarioService usuarioService;
+	@Autowired
+	private UsuarioService usuarioService;
+	
+	@Autowired
+	private ProdutoService produtoService;
 	
 	@Autowired
 	private PedidoItemService pedidoItemService;
@@ -50,12 +55,17 @@ public class PedidoService {
 	@Transactional
 	public PedidoResponseDTO adicionar(PedidoRequestDTO pedidoRequest){
 	        
-		Pedido pedidoModel = mapper.map(pedidoRequest, Pedido.class);
+		PedidoResponseDTO teste = mapper.map(pedidoRequest, PedidoResponseDTO.class);
+		teste.setVltotalPedido(0);
+		teste.setUsuario(mapper.map(usuarioService.obterPorId(teste.getUsuario().getId()), UsuarioResponseDTO.class));
+		Pedido pedidoModel = mapper.map(teste, Pedido.class);
 		
 		pedidoModel = pedidoRepository.save(pedidoModel);
 		
 		List<PedidoItem> pedidoItens = adicionarPedidoItens(pedidoRequest.getPedidoItens(), pedidoModel);
-		pedidoModel.setPedidoItens(pedidoItens);	
+		pedidoModel.setPedidoItens(pedidoItens);
+
+		pedidoModel = pedidoRepository.save(pedidoModel);	
 		
 		return mapper.map(pedidoModel, PedidoResponseDTO.class);
 	}
@@ -81,11 +91,15 @@ public class PedidoService {
         List<PedidoItem> prAdicionados = new ArrayList<>();
 
         for(PedidoItemRequestDTO pdoItemRequest : pedidoItemRequest){
-        	pdoItemRequest.setIdPedido(mapper.map(pedidoModel, PedidoRequestDTO.class));
+        	pdoItemRequest.setPedido(mapper.map(pedidoModel, PedidoResponseDTO.class));
         	
-        	double vlTotal = pdoItemRequest.getIdProduto().getVlProduto() * pdoItemRequest.getQtdPedidoitem();
-        	PedidoItemResponseDTO pedidoItemResponse =  pedidoItemService.adicionar(pdoItemRequest);
+        	ProdutoResponseDTO prResponse = produtoService.obterPorId(pdoItemRequest.getProduto().getId());	
+        	pdoItemRequest.setProduto(prResponse);
+        	double vlTotal = pdoItemRequest.getProduto().getVlProduto() * pdoItemRequest.getQtdPedidoitem();
+        	PedidoItemResponseDTO pedidoItemResponse = mapper.map(pdoItemRequest, PedidoItemResponseDTO.class);
         	pedidoItemResponse.setVltotalItem(vlTotal);
+        	pedidoItemResponse =  pedidoItemService.adicionar(mapper.map(pedidoItemResponse, PedidoItemRequestDTO.class));
+        	pedidoModel.setVltotalPedido(pedidoModel.getVltotalPedido()+vlTotal);
         	PedidoItem pedidoItem = mapper.map(pedidoItemResponse, PedidoItem.class);
         	prAdicionados.add(pedidoItem);
         }

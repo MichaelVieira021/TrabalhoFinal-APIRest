@@ -1,7 +1,9 @@
 package br.com.ecommerce.jemn.dto.pedido;
 
+import java.util.Date;
 import java.util.List;
 import br.com.ecommerce.jemn.dto.pedidoItem.PedidoItemRequestDTO;
+import br.com.ecommerce.jemn.dto.usuario.UsuarioResponseDTO;
 import br.com.ecommerce.jemn.model.FormaPagamento;
 import br.com.ecommerce.jemn.model.Usuario;
 
@@ -10,13 +12,25 @@ public class PedidoRequestDTO {
     private String obsPedido;
     private FormaPagamento formaPg;
     private List<PedidoItemRequestDTO> pedidoItens;
-    private Usuario usuario;
+    private Date dtPedido;
+    private UsuarioResponseDTO usuario;
     
-    public Usuario getUsuario() {
+    public PedidoRequestDTO() {
+    	this.dtPedido = new Date();
+    }
+    public Date getDtPedido() {
+		return dtPedido;
+	}
+
+	public void setDtPedido(Date dtPedido) {
+		this.dtPedido = dtPedido;
+	}
+
+	public UsuarioResponseDTO getUsuario() {
         return usuario;
     }
 
-    public void setUsuario(Usuario usuario) {
+    public void setUsuario(UsuarioResponseDTO usuario) {
         this.usuario = usuario;
     }
 

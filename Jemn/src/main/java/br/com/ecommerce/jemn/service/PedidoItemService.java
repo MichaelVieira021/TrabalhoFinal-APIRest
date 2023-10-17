@@ -6,14 +6,9 @@ import java.util.stream.Collectors;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
-import br.com.ecommerce.jemn.dto.pedido.PedidoResponseDTO;
 import br.com.ecommerce.jemn.dto.pedidoItem.PedidoItemRequestDTO;
 import br.com.ecommerce.jemn.dto.pedidoItem.PedidoItemResponseDTO;
-import br.com.ecommerce.jemn.dto.produto.ProdutoResponseDTO;
-import br.com.ecommerce.jemn.model.Pedido;
 import br.com.ecommerce.jemn.model.PedidoItem;
-import br.com.ecommerce.jemn.model.Produto;
 import br.com.ecommerce.jemn.repository.PedidoItemRepository;
 
 @Service
@@ -22,11 +17,11 @@ public class PedidoItemService {
 	@Autowired
 	private PedidoItemRepository pedidoItemRepository;
 
-	@Autowired
-	private ProdutoService produtoService;
+	//@Autowired
+	//private ProdutoService produtoService;
 
-	@Autowired
-	private PedidoService pedidoService;
+	//@Autowired
+	//private PedidoService pedidoService;
 	
 	@Autowired
 	private ModelMapper mapper;
@@ -36,9 +31,9 @@ public class PedidoItemService {
 		List<PedidoItem> pedidoItems = pedidoItemRepository.findAll();
 
 		return pedidoItems
-				.stream()
-				.map(pedidoItem -> mapper.map(pedidoItem, PedidoItemResponseDTO.class))
-				.collect(Collectors.toList());	
+			.stream()
+			.map(pedidoItem -> mapper.map(pedidoItem, PedidoItemResponseDTO.class))
+			.collect(Collectors.toList());	
 	}
 	
 	public PedidoItemResponseDTO obterPorId(Long id) {
@@ -50,17 +45,19 @@ public class PedidoItemService {
 	
 	public PedidoItemResponseDTO adicionar(PedidoItemRequestDTO pedidoItemRequest){
 		
-		Long idProduto = pedidoItemRequest.getIdProduto().getId();
-		Long idPedido = pedidoItemRequest.getIdPedido().getId();
+		//Long idProduto = pedidoItemRequest.getIdProduto().getId();
+		//Long idPedido = pedidoItemRequest.getIdPedido().getId();
 
-		ProdutoResponseDTO produtoResponse = produtoService.obterPorId(idProduto);
-		PedidoResponseDTO pedidoResponse = pedidoService.obterPorId(idPedido);
+		//ProdutoResponseDTO produtoResponse = produtoService.obterPorId(idProduto);
+		//PedidoResponseDTO pedidoResponse = pedidoService.obterPorId(idPedido);
 
-		pedidoItemRequest.setIdProduto(mapper.map(produtoResponse, Produto.class));
-		pedidoItemRequest.setIdPedido(mapper.map(pedidoResponse, Pedido.class));
+		//pedidoItemRequest.setIdProduto(mapper.map(produtoResponse, Produto.class));
+		//pedidoItemRequest.setIdPedido(mapper.map(pedidoResponse, Pedido.class));
 
 		PedidoItem pedidoItemModel = mapper.map(pedidoItemRequest, PedidoItem.class);
 		
+		//PedidoResponseDTO pd = pedidoService.obterPorId(id);
+		//pedidoItemModel.setPedido(mapper.map(pd, Pedido.class));
 		pedidoItemModel = pedidoItemRepository.save(pedidoItemModel);
 		
 		return mapper.map(pedidoItemModel, PedidoItemResponseDTO.class);

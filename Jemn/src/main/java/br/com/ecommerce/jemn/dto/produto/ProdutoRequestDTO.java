@@ -1,10 +1,6 @@
 package br.com.ecommerce.jemn.dto.produto;
 
-
-
 import br.com.ecommerce.jemn.model.Categoria;
-
-
 
 public class ProdutoRequestDTO {
 	
@@ -13,7 +9,6 @@ public class ProdutoRequestDTO {
     private double vlProduto;
     private Integer qtdProduto;
     private Categoria categoria;
-   
     
     public Categoria getCategoria() {
         return categoria;
@@ -54,5 +49,4 @@ public class ProdutoRequestDTO {
     public void setQtdProduto(Integer qtdProduto) {
         this.qtdProduto = qtdProduto;
     }
-
 }

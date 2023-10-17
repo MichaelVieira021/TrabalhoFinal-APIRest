@@ -2,7 +2,6 @@ package br.com.ecommerce.jemn.model;
 
 import java.util.Date;
 import java.util.List;
-
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
@@ -40,14 +39,14 @@ public class Pedido {
     private String obsPedido;
 
     @Column(nullable = false)
-    @Enumerated(EnumType.STRING)
+    //@Enumerated(EnumType.STRING)
     private FormaPagamento formaPg;
 
     @OneToMany(mappedBy = "pedido")
     private List<PedidoItem> pedidoItens;
 
     @ManyToOne
-    @JoinColumn(name = "idUsuario", nullable = false)
+    @JoinColumn(name = "idUsuario")
     @JsonBackReference
     private Usuario usuario;
     
@@ -110,7 +109,20 @@ public class Pedido {
 	public void setFormaPg(FormaPagamento formaPg) {
 		this.formaPg = formaPg;
 	}
-    
-    
-        
+
+	public List<PedidoItem> getPedidoItens() {
+		return pedidoItens;
+	}
+
+	public void setPedidoItens(List<PedidoItem> pedidoItens) {
+		this.pedidoItens = pedidoItens;
+	}
+
+	public Usuario getUsuario() {
+		return usuario;
+	}
+
+	public void setUsuario(Usuario usuario) {
+		this.usuario = usuario;
+	}     
 }

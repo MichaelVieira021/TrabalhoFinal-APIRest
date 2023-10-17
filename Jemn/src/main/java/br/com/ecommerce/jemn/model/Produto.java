@@ -11,7 +11,6 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 
-
 import com.fasterxml.jackson.annotation.JsonBackReference;
 
 @Entity
@@ -41,8 +40,6 @@ public class Produto {
 
     @OneToMany(mappedBy = "produto")
     private List<PedidoItem> pedidoItens;
-
-   
 
     public Long getId() {
         return id;

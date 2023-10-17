@@ -39,15 +39,15 @@ public class CategoriaController {
 	}
 	@Operation(summary = "Buscar  Categorias Cadastradas  por ID ", method = "GET", description = "Serve para buscar somente por ID as categorias que ja estão cadastradas no BD, todos podem fazer essa busca")
 
-	
 		@ApiResponse(responseCode = "200", description = "Busca por ID realizada com sucesso")
 		@ApiResponse(responseCode = "422", description = "Dados de requisição inválidos")
 		@ApiResponse(responseCode = "400", description = "Paramentros inválidos")
 		@ApiResponse(responseCode = "500", description = "Erro ao realizar busca dos Dados por ID")
-	@GetMapping("/{id}")
+		@GetMapping("/{id}")
 	public ResponseEntity<CategoriaResponseDTO> obterPorId(@PathVariable Long id){
 		return ResponseEntity.ok(categoriaService.obterPorId(id));
 	}
+	
 	@Operation(summary = "Cadastra Categorias ", method = "POST", description = "Metodo para cadastrar as Categorias (sendo possivel cadastrar somente tendo a permissão de 'admin')")
 
 	

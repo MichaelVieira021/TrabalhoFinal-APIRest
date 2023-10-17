@@ -12,7 +12,6 @@ import br.com.ecommerce.jemn.dto.produto.ProdutoRequestDTO;
 import br.com.ecommerce.jemn.dto.produto.ProdutoResponseDTO;
 import br.com.ecommerce.jemn.model.Categoria;
 import br.com.ecommerce.jemn.model.Produto;
-import br.com.ecommerce.jemn.repository.CategoriaRepository;
 import br.com.ecommerce.jemn.repository.ProdutoRepository;
 
 @Service

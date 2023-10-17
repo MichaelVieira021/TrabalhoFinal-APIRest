@@ -1,10 +1,13 @@
 package br.com.ecommerce.jemn.dto.pedidoItem;
 
+import br.com.ecommerce.jemn.model.Pedido;
+import br.com.ecommerce.jemn.model.Produto;
+
 public class PedidoItemRequestDTO {
     
     private Integer qtdPedidoitem;
-    private Long idProduto;
-    private Long idPedido;
+    private Produto idProduto;
+    private Pedido idPedido;
 
     public Integer getQtdPedidoitem() {
         return qtdPedidoitem;
@@ -14,21 +17,20 @@ public class PedidoItemRequestDTO {
         this.qtdPedidoitem = qtdPedidoitem;
     }
 
-     public Long getIdProduto() {
+    public Produto getIdProduto() {
         return idProduto;
     }
 
-    public void setIdProduto(Long idProduto) {
+    public void setIdProduto(Produto idProduto) {
         this.idProduto = idProduto;
     }
 
-    public Long getIdPedido() {
+    public Pedido getIdPedido() {
         return idPedido;
     }
 
-    public void setIdPedido(Long idPedido) {
+    public void setIdPedido(Pedido idPedido) {
         this.idPedido = idPedido;
-    }
-
+    }  
    
 }

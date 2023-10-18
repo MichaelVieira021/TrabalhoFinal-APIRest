@@ -6,6 +6,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import br.com.ecommerce.jemn.dto.pedido.PedidoRequestDTO;
@@ -17,10 +18,14 @@ import br.com.ecommerce.jemn.dto.usuario.UsuarioResponseDTO;
 import br.com.ecommerce.jemn.model.FormaPagamento;
 import br.com.ecommerce.jemn.model.Pedido;
 import br.com.ecommerce.jemn.model.PedidoItem;
+import br.com.ecommerce.jemn.model.email.Email;
 import br.com.ecommerce.jemn.repository.PedidoRepository;
 
 @Service
 public class PedidoService {
+
+	@Autowired
+	private EmailService emailService;
 
 	@Autowired
 	private PedidoRepository pedidoRepository;
@@ -68,7 +73,9 @@ public class PedidoService {
 		
 		formaPagamento(pedidoModel);
 
-		pedidoModel = pedidoRepository.save(pedidoModel);	
+		pedidoModel = pedidoRepository.save(pedidoModel);
+		
+		testeEnvioDeEmail(pedidoModel);
 		
 		return mapper.map(pedidoModel, PedidoResponseDTO.class);
 	}
@@ -108,6 +115,79 @@ public class PedidoService {
         }
 
         return prAdicionados;
+
+		
+    }
+
+	 public ResponseEntity<?> testeEnvioDeEmail(Pedido pedido) {
+
+        //List<String> destinatarios = new ArrayList<>();
+        //destinatarios.add("janieltonmedeiros@outlook.com");
+
+		String destinatario = pedido.getUsuario().getEmail();
+        // Obtém todos os pedidos
+        //List<PedidoResponseDTO> pedidos = pedidoService.obterTodos();
+
+        // Gera o HTML com os dados dos pedidos
+        String mensagem = gerarHTMLComDadosDosPedidos(pedido);
+
+        // Cria o email
+        Email email = new Email("RESUMO PEDIDO JEMN", mensagem, "elton.medeiros14@gmail.com", destinatario);
+
+        // Envia o email
+        emailService.enviar(email);
+
+        return ResponseEntity.status(200).body("E-mail enviado com sucesso!!!");
+    }
+
+    private String gerarHTMLComDadosDosPedidos(Pedido pedido) {
+        StringBuilder html = new StringBuilder();
+
+        // Cabeçalho do HTML
+        // html.append("<h1>Resumo de pedidos</h1>");
+
+        // Tabela com os dados dos pedidos
+        
+            html.append("<style>");
+            html.append("table {");
+            html.append("border-collapse: collapse;");
+            html.append("width: 100%;");
+            html.append("}");
+
+            html.append("th, td {");
+            html.append("padding: 8px;");
+            html.append("border: 1px solid black;");
+            html.append("}");
+
+            html.append("th {");
+            html.append("background-color: #ffcbdb;");
+            html.append("text-align: center;");
+            html.append("}");
+
+            html.append("td {");
+            html.append("text-align: left;");
+            html.append("}");
+            html.append("</style>");
+
+            html.append("<div style=\"text-align: center;\">");
+            html.append("<h1>Seu Pedido Jemn ❤️</h1>");
+            html.append("<table style=\"border-collapse: collapse;\">");
+            html.append("<tr>");
+            html.append("<th>Número do pedido</th>");
+			html.append("<th>Valor total do pedido</th>");
+            html.append("</tr>");
+
+        
+            html.append("<tr>");
+            html.append("<td>" + pedido.getId() + "</td>");
+			html.append("<td>" + pedido.getVltotalPedido() + "</td>");
+            html.append("</tr>");
+       		html.append("</table>");
+
+        // Rodape do HTML
+        html.append("<p><h3>Obrigado por seu pedido! 🥰</h3></p>");
+
+        return html.toString();
     }
     
     public Pedido formaPagamento(Pedido pd) {

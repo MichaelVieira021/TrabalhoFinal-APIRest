@@ -1,5 +1,6 @@
 package br.com.ecommerce.jemn.service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -39,6 +40,22 @@ public class ProdutoService {
 		Optional<Produto> optProduto = produtoRepository.findById(id);
 		
 		return mapper.map(optProduto.get(), ProdutoResponseDTO.class);
+	}
+	
+	public List<ProdutoResponseDTO> obterPorCategoria(Long id) {
+		List<Produto> produtos = produtoRepository.findAll();
+		
+		List<Produto> prs = new ArrayList<>();
+		
+		for(Produto pr : produtos) {
+			if(pr.getCategoria().getId() == id){
+				prs.add(pr);
+			}
+		}
+		return prs
+				.stream()
+				.map(produto -> mapper.map(produto, ProdutoResponseDTO.class))
+				.collect(Collectors.toList());
 	}
 
 	public ProdutoResponseDTO adicionar(ProdutoRequestDTO produtoRequest){

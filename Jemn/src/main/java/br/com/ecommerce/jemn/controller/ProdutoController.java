@@ -33,6 +33,11 @@ public class ProdutoController {
 	public ResponseEntity<ProdutoResponseDTO> obterPorId(@PathVariable Long id){
 		return ResponseEntity.ok(produtoService.obterPorId(id));
 	}
+	
+	@GetMapping("/categoria/{id}")
+	public ResponseEntity<List<ProdutoResponseDTO>> obterPorCategoria(@PathVariable Long id){
+		return ResponseEntity.ok(produtoService.obterPorCategoria(id));
+	}
 
 	@PostMapping
 	public ResponseEntity<ProdutoResponseDTO> adicionar(@RequestBody ProdutoRequestDTO produtoRequest){

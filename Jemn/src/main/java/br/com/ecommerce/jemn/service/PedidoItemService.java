@@ -7,11 +7,8 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import br.com.ecommerce.jemn.dto.categoria.CategoriaResponseDTO;
 import br.com.ecommerce.jemn.dto.pedidoItem.PedidoItemRequestDTO;
 import br.com.ecommerce.jemn.dto.pedidoItem.PedidoItemResponseDTO;
-import br.com.ecommerce.jemn.dto.produto.ProdutoResponseDTO;
-import br.com.ecommerce.jemn.model.Categoria;
 import br.com.ecommerce.jemn.model.PedidoItem;
 import br.com.ecommerce.jemn.repository.PedidoItemRepository;
 
@@ -20,9 +17,6 @@ public class PedidoItemService {
 	
 	@Autowired
 	private PedidoItemRepository pedidoItemRepository;
-
-	@Autowired
-	private ProdutoService produtoService;
 
 	//@Autowired
 	//private PedidoService pedidoService;

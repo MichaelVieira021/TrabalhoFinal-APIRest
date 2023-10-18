@@ -1,12 +1,14 @@
 package br.com.ecommerce.jemn.dto.usuario;
 
+import br.com.ecommerce.jemn.model.ETipoPerfil;
+
 public abstract class UsuarioBaseDTO {
     
     private String nomeUsuario;
     private String email;
     private String telefone;
-    private int perfil; // TOKEN
-    
+    private ETipoPerfil perfil; // TOKEN
+
     public String getNomeUsuario() {
         return nomeUsuario;
     }
@@ -31,11 +33,11 @@ public abstract class UsuarioBaseDTO {
         this.telefone = telefone;
     }
 
-    public int getPerfil() {
+     public ETipoPerfil getPerfil() {
         return perfil;
     }
 
-    public void setPerfil(int perfil) {
+    public void setPerfil(ETipoPerfil perfil) {
         this.perfil = perfil;
     }
 

@@ -1,5 +1,6 @@
 package br.com.ecommerce.jemn.controller;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,6 +16,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import br.com.ecommerce.jemn.dto.pedido.PedidoRequestDTO;
 import br.com.ecommerce.jemn.dto.pedido.PedidoResponseDTO;
+import br.com.ecommerce.jemn.model.email.Email;
+import br.com.ecommerce.jemn.service.EmailService;
 import br.com.ecommerce.jemn.service.PedidoService;
 
 @RestController
@@ -23,6 +26,9 @@ public class PedidoController {
 
 	@Autowired
 	private PedidoService pedidoService;
+
+	//@Autowired
+	//private EmailService emailService;
 
 	@GetMapping
 	public ResponseEntity<List<PedidoResponseDTO>> obterTodos(){
@@ -49,4 +55,6 @@ public class PedidoController {
 		pedidoService.deletar(id);
 		return ResponseEntity.status(204).build();
 	}
+
 }
+

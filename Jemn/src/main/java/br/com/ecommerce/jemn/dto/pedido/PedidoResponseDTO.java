@@ -40,7 +40,6 @@ public class PedidoResponseDTO extends PedidoRequestDTO{
 	public void setAcrescimoPedido(double acrescimoPedido) {
 		this.acrescimoPedido = acrescimoPedido;
 	}
-    
-    
 
+	
 }

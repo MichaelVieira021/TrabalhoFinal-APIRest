@@ -5,7 +5,7 @@ import java.util.List;
 import br.com.ecommerce.jemn.dto.pedidoItem.PedidoItemRequestDTO;
 import br.com.ecommerce.jemn.dto.usuario.UsuarioResponseDTO;
 import br.com.ecommerce.jemn.model.FormaPagamento;
-import br.com.ecommerce.jemn.model.Usuario;
+//import br.com.ecommerce.jemn.model.Usuario;
 
 public class PedidoRequestDTO {
      

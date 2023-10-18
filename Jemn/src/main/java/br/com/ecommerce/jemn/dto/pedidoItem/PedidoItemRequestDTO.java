@@ -9,7 +9,7 @@ public class PedidoItemRequestDTO {
     private Integer qtdPedidoitem;
     private ProdutoResponseDTO produto;
     private PedidoResponseDTO pedido;
-
+    
     public Integer getQtdPedidoitem() {
         return qtdPedidoitem;
     }

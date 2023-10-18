@@ -9,6 +9,7 @@ public class ProdutoRequestDTO {
     private double vlProduto;
     private Integer qtdProduto;
     private Categoria categoria;
+    private boolean ativo;
     
     public Categoria getCategoria() {
         return categoria;
@@ -49,4 +50,14 @@ public class ProdutoRequestDTO {
     public void setQtdProduto(Integer qtdProduto) {
         this.qtdProduto = qtdProduto;
     }
+
+    public boolean isAtivo() {
+        return ativo;
+    }
+
+    public void setAtivo(boolean ativo) {
+        this.ativo = ativo;
+    }
+
+    
 }

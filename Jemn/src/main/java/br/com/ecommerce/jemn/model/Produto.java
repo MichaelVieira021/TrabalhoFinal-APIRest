@@ -45,6 +45,9 @@ public class Produto {
      @Column(nullable = true ,columnDefinition = "TEXT")
     private String flieBase64;
 
+    @Column(nullable = false)
+    private boolean ativo;
+
 
     public Long getId() {
         return id;
@@ -101,6 +104,15 @@ public class Produto {
     public void setFlieBase64(String flieBase64) {
         this.flieBase64 = flieBase64;
     }
+
+    public boolean isAtivo() {
+        return ativo;
+    }
+
+    public void setAtivo(boolean ativo) {
+        this.ativo = ativo;
+    }
+    
     
     
 }

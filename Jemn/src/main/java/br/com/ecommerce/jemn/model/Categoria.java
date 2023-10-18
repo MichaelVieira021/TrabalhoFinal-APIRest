@@ -24,6 +24,9 @@ public class Categoria {
 
     @OneToMany(mappedBy = "categoria")
     private List<Produto> produtos;
+    
+    @Column(nullable = false)
+    private boolean ativo;
 
     public Long getId() {
         return id;
@@ -49,5 +52,14 @@ public class Categoria {
         this.obsCategoria = obsCategoria;
     }
 
+    public boolean isAtivo() {
+        return ativo;
+    }
+
+    public void setAtivo(boolean ativo) {
+        this.ativo = ativo;
+    }
+
+    
     
 }

@@ -40,6 +40,7 @@ public class ProdutoService {
 		
 		return produtos
 				.stream()
+				.filter(produto -> produto.isAtivo())
 				.map(produto -> mapper.map(produto, ProdutoResponseDTO.class))
 				.collect(Collectors.toList());
 	}
@@ -62,6 +63,7 @@ public class ProdutoService {
 		}
 		return prs
 				.stream()
+				.filter((categoria -> categoria.isAtivo()))
 				.map(produto -> mapper.map(produto, ProdutoResponseDTO.class))
 				.collect(Collectors.toList());
 	}
@@ -72,6 +74,7 @@ public class ProdutoService {
 		CategoriaResponseDTO categoriaResponse = categoriaService.obterPorId(i);		
 		produtoRequest.setCategoria(mapper.map(categoriaResponse, Categoria.class));
 		Produto produtoModel = mapper.map(produtoRequest, Produto.class);
+		produtoModel.setAtivo(true);
 
 		produtoModel = produtoRepository.save(produtoModel);
 		

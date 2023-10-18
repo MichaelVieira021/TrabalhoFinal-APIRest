@@ -26,6 +26,7 @@ public class CategoriaService {
 
 		return categorias
 				.stream()
+				.filter(categoria -> categoria.isAtivo())
 				.map(categoria -> mapper.map(categoria, CategoriaResponseDTO.class))
 				.collect(Collectors.toList());	
 	}
@@ -40,7 +41,7 @@ public class CategoriaService {
 	public CategoriaResponseDTO adicionar(CategoriaRequestDTO categoriaRequest){
 		
 		Categoria categoriaModel = mapper.map(categoriaRequest, Categoria.class);
-		
+		categoriaModel.setAtivo(true);
 		categoriaModel = categoriaRepository.save(categoriaModel);
 		
 		return mapper.map(categoriaModel, CategoriaResponseDTO.class);

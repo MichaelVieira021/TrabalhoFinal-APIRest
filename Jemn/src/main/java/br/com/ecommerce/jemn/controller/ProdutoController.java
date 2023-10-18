@@ -62,7 +62,11 @@ public class ProdutoController {
 	public ResponseEntity<ProdutoResponseDTO> obterPorId(@PathVariable Long id){
 		return ResponseEntity.ok(produtoService.obterPorId(id));
 	}
-@Operation(summary = "Cadastra  Produto  ", method = "POST",description = "Metodo para Cadastrar um Produto, sendo possivel Cadastrar somente tendo a permissão de 'admin'")
+	
+	@GetMapping("/categoria/{id}")
+	public ResponseEntity<List<ProdutoResponseDTO>> obterPorCategoria(@PathVariable Long id){
+		return ResponseEntity.ok(produtoService.obterPorCategoria(id));
+	}
 
 	
 		@ApiResponse(responseCode = "200", description = "Produto Cadastrado com sucesso")

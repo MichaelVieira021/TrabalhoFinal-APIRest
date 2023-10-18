@@ -14,6 +14,7 @@ import br.com.ecommerce.jemn.dto.pedidoItem.PedidoItemRequestDTO;
 import br.com.ecommerce.jemn.dto.pedidoItem.PedidoItemResponseDTO;
 import br.com.ecommerce.jemn.dto.produto.ProdutoResponseDTO;
 import br.com.ecommerce.jemn.dto.usuario.UsuarioResponseDTO;
+import br.com.ecommerce.jemn.model.FormaPagamento;
 import br.com.ecommerce.jemn.model.Pedido;
 import br.com.ecommerce.jemn.model.PedidoItem;
 import br.com.ecommerce.jemn.repository.PedidoRepository;
@@ -64,6 +65,8 @@ public class PedidoService {
 		
 		List<PedidoItem> pedidoItens = adicionarPedidoItens(pedidoRequest.getPedidoItens(), pedidoModel);
 		pedidoModel.setPedidoItens(pedidoItens);
+		
+		formaPagamento(pedidoModel);
 
 		pedidoModel = pedidoRepository.save(pedidoModel);	
 		
@@ -105,5 +108,20 @@ public class PedidoService {
         }
 
         return prAdicionados;
+    }
+    
+    public Pedido formaPagamento(Pedido pd) {
+    	
+    	if(pd.getFormaPg().equals(FormaPagamento.BOLETO) || pd.getFormaPg().equals(FormaPagamento.PIX)) {
+    		pd.setDescontoPedido(0.05);
+    		pd.setAcrescimoPedido(0);
+    		pd.setVltotalPedido(pd.getVltotalPedido()-(pd.getVltotalPedido()*pd.getDescontoPedido()));
+    	}else if(pd.getFormaPg().equals(FormaPagamento.CARTAOCREDITO) || pd.getFormaPg().equals(FormaPagamento.CARTAODEBITO)){
+    		pd.setAcrescimoPedido(0.05);
+    		pd.setDescontoPedido(0);
+    		pd.setVltotalPedido(pd.getVltotalPedido()+(pd.getVltotalPedido()*pd.getAcrescimoPedido()));
+    	}
+	
+    	return pd;
     }
 }

@@ -6,9 +6,12 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
+
 import br.com.ecommerce.jemn.dto.pedido.PedidoRequestDTO;
 import br.com.ecommerce.jemn.dto.pedido.PedidoResponseDTO;
 import br.com.ecommerce.jemn.dto.pedidoItem.PedidoItemRequestDTO;
@@ -107,6 +110,10 @@ public class PedidoService {
         	pdoItemRequest.setProduto(prResponse);
         	PedidoItemResponseDTO pedidoItemResponse = mapper.map(pdoItemRequest, PedidoItemResponseDTO.class);
         	
+			if (pedidoItemResponse.getQtdPedidoitem() > pedidoItemResponse.getProduto().getQtdProduto()){
+ 				throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Quantidade solicitada é maior que a quantidade em estoque");			
+			}
+
 			if (pedidoItemResponse.getQtdPedidoitem() >= 5){
 				pedidoItemResponse.setDescontoItem((pedidoItemResponse.getProduto().getVlProduto()* pedidoItemResponse.getQtdPedidoitem())* 0.05);
 				pedidoModel.setDescontoPedido(pedidoModel.getDescontoPedido() + pedidoItemResponse.getDescontoItem());
@@ -200,12 +207,10 @@ public class PedidoService {
     	
     	if(pd.getFormaPg().equals(FormaPagamento.BOLETO) || pd.getFormaPg().equals(FormaPagamento.PIX)) {
     		pd.setDescontoPedido(pd.getDescontoPedido() + (pd.getVltotalPedido() * 0.05));
-    		pd.setAcrescimoPedido(0);
     		pd.setVltotalPedido(pd.getVltotalPedido() - (pd.getVltotalPedido() * 0.05));
     	}else if(pd.getFormaPg().equals(FormaPagamento.CARTAOCREDITO) || pd.getFormaPg().equals(FormaPagamento.CARTAODEBITO)){
-    		pd.setAcrescimoPedido(0.05);
-    		pd.setDescontoPedido(0);
-    		pd.setVltotalPedido(pd.getVltotalPedido() + (pd.getVltotalPedido()*pd.getAcrescimoPedido()));
+    		pd.setAcrescimoPedido(pd.getAcrescimoPedido() + (pd.getVltotalPedido() * 0.05));
+    		pd.setVltotalPedido(pd.getVltotalPedido() + (pd.getVltotalPedido()* 0.05));
     	}
 	
     	return pd;

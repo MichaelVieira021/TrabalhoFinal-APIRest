@@ -1,7 +1,6 @@
 package br.com.ecommerce.jemn.dto.pedidoItem;
 
 import br.com.ecommerce.jemn.dto.pedido.PedidoResponseDTO;
-import br.com.ecommerce.jemn.dto.produto.ProdutoRequestDTO;
 import br.com.ecommerce.jemn.dto.produto.ProdutoResponseDTO;
 
 public class PedidoItemRequestDTO {

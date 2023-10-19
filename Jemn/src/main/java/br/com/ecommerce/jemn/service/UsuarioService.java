@@ -1,21 +1,41 @@
 package br.com.ecommerce.jemn.service;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import br.com.ecommerce.jemn.dto.usuario.UsuarioLoginResponseDTO;
 import br.com.ecommerce.jemn.dto.usuario.UsuarioRequestDTO;
 import br.com.ecommerce.jemn.dto.usuario.UsuarioResponseDTO;
 import br.com.ecommerce.jemn.model.Usuario;
 import br.com.ecommerce.jemn.repository.UsuarioRepository;
+import br.com.ecommerce.jemn.security.JWTService;
 
 @Service
 public class UsuarioService {
+
+	private static final String BEARER = "Bearer ";
 	
 	@Autowired
 	private UsuarioRepository usuarioRepository;
+
+	@Autowired
+    private JWTService jwtService;
+
+	@Autowired
+    private AuthenticationManager authenticationManager;
+
+	@Autowired
+    private PasswordEncoder passwordEncoder;
 	
 	@Autowired
 	private ModelMapper mapper;
@@ -40,7 +60,13 @@ public class UsuarioService {
 	public UsuarioResponseDTO adicionar(UsuarioRequestDTO usuarioRequest){
 		
 		Usuario usuarioModel = mapper.map(usuarioRequest, Usuario.class);
+
+		// Aqui to criptografando a senha antes de salvar no banco de dados.
+        String senha =  passwordEncoder.encode(usuarioModel.getSenha());
 		
+		usuarioModel.setSenha(senha);
+        usuarioModel.setId(0L);
+
 		usuarioModel = usuarioRepository.save(usuarioModel);
 		
 		return mapper.map(usuarioModel, UsuarioResponseDTO.class);
@@ -63,4 +89,28 @@ public class UsuarioService {
 		
 		usuarioRepository.deleteById(id);
 	}
+
+	public UsuarioResponseDTO obterPorEmail(String email){
+        Optional<Usuario> optUsuario =  usuarioRepository.findByEmail(email);
+
+        return mapper.map(optUsuario.get(),UsuarioResponseDTO.class);
+    }
+
+    public UsuarioLoginResponseDTO logar(String email, String senha){
+        // Aqui que a autenticação acontece dentro do spring automagicamente.
+        Authentication autenticacao = authenticationManager
+            .authenticate(new UsernamePasswordAuthenticationToken(email, senha,Collections.emptyList()));
+            
+        // Aqui eu passo a nova autenticação para o springSecurity cuidar pra mim.
+        SecurityContextHolder.getContext().setAuthentication(autenticacao);
+
+        // Crio o token JWT
+        String token =  BEARER + jwtService.gerarToken(autenticacao);
+    
+        // Pego o usuario dono do token
+        UsuarioResponseDTO usuarioResponse = obterPorEmail(email);
+
+        // Crio e devolvo o DTO esperado.
+        return new UsuarioLoginResponseDTO(token, usuarioResponse);
+    }
 }

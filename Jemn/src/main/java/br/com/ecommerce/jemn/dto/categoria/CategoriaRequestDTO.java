@@ -4,6 +4,7 @@ public class CategoriaRequestDTO {
 
     private String nomeCategoria;
     private String obsCategoria;
+    private boolean ativo;
 
     public String getNomeCategoria() {
         return nomeCategoria;
@@ -20,4 +21,14 @@ public class CategoriaRequestDTO {
     public void setObsCategoria(String obsCategoria) {
         this.obsCategoria = obsCategoria;
     }
+
+    public boolean isAtivo() {
+        return ativo;
+    }
+
+    public void setAtivo(boolean ativo) {
+        this.ativo = ativo;
+    }
+
+    
 }

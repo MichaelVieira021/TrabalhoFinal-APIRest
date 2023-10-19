@@ -1,7 +1,4 @@
 package br.com.ecommerce.jemn.dto.pedido;
-
-
-
 public class PedidoResponseDTO extends PedidoRequestDTO{
     
     private Long id;

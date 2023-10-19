@@ -33,6 +33,7 @@ public class Produto {
     @Column(nullable = false)
     private Integer qtdProduto;
 
+   
     @ManyToOne
     @JoinColumn(name = "idCategoria", nullable = false)
     @JsonBackReference
@@ -40,6 +41,13 @@ public class Produto {
 
     @OneToMany(mappedBy = "produto")
     private List<PedidoItem> pedidoItens;
+
+     @Column(nullable = true ,columnDefinition = "TEXT")
+    private String flieBase64;
+
+    @Column(nullable = false)
+    private boolean ativo;
+
 
     public Long getId() {
         return id;
@@ -88,6 +96,23 @@ public class Produto {
 	public void setCategoria(Categoria categoria) {
 		this.categoria = categoria;
 	}
+
+    public String getFlieBase64() {
+        return flieBase64;
+    }
+
+    public void setFlieBase64(String flieBase64) {
+        this.flieBase64 = flieBase64;
+    }
+
+    public boolean isAtivo() {
+        return ativo;
+    }
+
+    public void setAtivo(boolean ativo) {
+        this.ativo = ativo;
+    }
+    
     
     
 }

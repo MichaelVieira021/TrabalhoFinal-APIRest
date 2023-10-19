@@ -119,7 +119,7 @@ public class PedidoService {
 		
     }
 
-	 public ResponseEntity<?> testeEnvioDeEmail(Pedido pedido) {
+	public ResponseEntity<?> testeEnvioDeEmail(Pedido pedido) {
 
         //List<String> destinatarios = new ArrayList<>();
         //destinatarios.add("janieltonmedeiros@outlook.com");
@@ -141,51 +141,63 @@ public class PedidoService {
     }
 
     private String gerarHTMLComDadosDosPedidos(Pedido pedido) {
-        StringBuilder html = new StringBuilder();
+	StringBuilder html = new StringBuilder();
 
-        // Cabeçalho do HTML
-        // html.append("<h1>Resumo de pedidos</h1>");
+		// Tabela com os dados dos pedidos
+		html.append("<style>");
+		html.append("table {");
+		html.append("border-collapse: collapse;");
+		html.append("width: 100%;");
+		html.append("}");
 
-        // Tabela com os dados dos pedidos
-        
-            html.append("<style>");
-            html.append("table {");
-            html.append("border-collapse: collapse;");
-            html.append("width: 100%;");
-            html.append("}");
+		html.append("th, td {");
+		html.append("padding: 8px;");
+		html.append("border: 1px solid black;");
+		html.append("}");
 
-            html.append("th, td {");
-            html.append("padding: 8px;");
-            html.append("border: 1px solid black;");
-            html.append("}");
+		html.append("th {");
+		html.append("background-color: #ffcbdb;");
+		html.append("text-align: center;");
+		html.append("}");
 
-            html.append("th {");
-            html.append("background-color: #ffcbdb;");
-            html.append("text-align: center;");
-            html.append("}");
+		html.append("td {");
+		html.append("background-color: #ffe4e1;");
+		html.append("text-align: center;");
+		html.append("}");
+		html.append("</style>");
 
-            html.append("td {");
-            html.append("text-align: left;");
-            html.append("}");
-            html.append("</style>");
+		html.append("<div style=\"text-align: center;\">");
+		
+		
+		//html.append("<img src=\"https://i.postimg.cc/zXR844bs/imagem-2023-10-19-000841048.png\" alt=\"imagem-2023-10-18-235948700\" border=\"0\" style=\"margin: 0 auto; max-width: 900px;\">");
+		html.append("<img src=\"https://i.postimg.cc/9M34LBwG/logook.png\" alt=\"imagem-2023-10-18-235948700\" border=\"0\" height:170px; width:250px;\">");
+		html.append("<h1 style=\"color:#292325\">Olá!</h1>");
+		html.append("<table style=\"border-collapse: collapse;\">");
+		html.append("<tr>");
+		html.append("<th>PRODUTOS COMPRADOS</th>");
+		html.append("<th>QUANTIDADE</th>");
+		html.append("<th>VALOR TOTAL DOS PRODUTOS</th>");
+		html.append("</tr>");
 
-            html.append("<div style=\"text-align: center;\">");
-            html.append("<h1>Seu Pedido Jemn ❤️</h1>");
-            html.append("<table style=\"border-collapse: collapse;\">");
-            html.append("<tr>");
-            html.append("<th>Número do pedido</th>");
-			html.append("<th>Valor total do pedido</th>");
-            html.append("</tr>");
+	
+		html.append("<h1 style=\"color:#292325\">" +  pedido.getUsuario().getNomeUsuario() +  "," +"  " + "seu pedido de Nº " + pedido.getId() + " "  + "foi finalizado com sucesso!"  + "</h1>");
+		html.append("<br>");
+		
+		for (PedidoItem pedidoItem : pedido.getPedidoItens()) {
+			html.append("<td>" + pedidoItem.getProduto().getNomeProduto() + "</td>");
+			html.append("<td>" + pedidoItem.getQtdPedidoitem() + "</td>");
+			html.append("<td>" + pedidoItem.getProduto().getVlProduto() * pedidoItem.getQtdPedidoitem() + "</td>");
+		html.append("</tr>");
+			
+		}
+		html.append("</table>");
 
-        
-            html.append("<tr>");
-            html.append("<td>" + pedido.getId() + "</td>");
-			html.append("<td>" + pedido.getVltotalPedido() + "</td>");
-            html.append("</tr>");
-       		html.append("</table>");
+		html.append("<h1 style=\"color:green\">Valor total do pedido: R$" + pedido.getVltotalPedido() + "</h1>");
+		//html.append("<h1>"  + "VALOR TOTAL DO PEDIDO:" + " " + "R$" + pedido.getVltotalPedido() + "</h1>");
+		
+		// Rodape do HTML
+		html.append("<p><h3 style=\"color:#292325\">Obrigado por sua compra! 🥰</h3></p>");
 
-        // Rodape do HTML
-        html.append("<p><h3>Obrigado por seu pedido! 🥰</h3></p>");
 
         return html.toString();
     }

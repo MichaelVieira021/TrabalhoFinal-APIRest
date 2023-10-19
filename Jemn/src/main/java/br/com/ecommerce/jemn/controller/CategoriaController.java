@@ -3,6 +3,7 @@ package br.com.ecommerce.jemn.controller;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -23,11 +24,13 @@ public class CategoriaController {
 	private CategoriaService categoriaService;
 	
 	@GetMapping
+	@PreAuthorize("hasAuthority('ADMIN')")
 	public ResponseEntity<List<CategoriaResponseDTO>> obterTodos(){
 		return ResponseEntity.ok(categoriaService.obterTodos());
 	}
 	
 	@GetMapping("/{id}")
+	@PreAuthorize("hasAuthority('USUARIO')")
 	public ResponseEntity<CategoriaResponseDTO> obterPorId(@PathVariable Long id){
 		return ResponseEntity.ok(categoriaService.obterPorId(id));
 	}

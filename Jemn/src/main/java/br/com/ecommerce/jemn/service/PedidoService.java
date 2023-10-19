@@ -105,11 +105,17 @@ public class PedidoService {
         	
         	ProdutoResponseDTO prResponse = produtoService.obterPorId(pdoItemRequest.getProduto().getId());	
         	pdoItemRequest.setProduto(prResponse);
-        	double vlTotal = pdoItemRequest.getProduto().getVlProduto() * pdoItemRequest.getQtdPedidoitem();
         	PedidoItemResponseDTO pedidoItemResponse = mapper.map(pdoItemRequest, PedidoItemResponseDTO.class);
-        	pedidoItemResponse.setVltotalItem(vlTotal);
+        	
+			if (pedidoItemResponse.getQtdPedidoitem() >= 5){
+				pedidoItemResponse.setDescontoItem((pedidoItemResponse.getProduto().getVlProduto()* pedidoItemResponse.getQtdPedidoitem())* 0.05);
+				pedidoModel.setDescontoPedido(pedidoModel.getDescontoPedido() + pedidoItemResponse.getDescontoItem());
+			}
+
+			double vlTotalItem = (pedidoItemResponse.getProduto().getVlProduto() - pedidoItemResponse.getDescontoItem() + pedidoItemResponse.getAcrecimoItem()) * pedidoItemResponse.getQtdPedidoitem();
+        	pedidoItemResponse.setVltotalItem(vlTotalItem);
         	pedidoItemResponse =  pedidoItemService.adicionar(mapper.map(pedidoItemResponse, PedidoItemRequestDTO.class));
-        	pedidoModel.setVltotalPedido(pedidoModel.getVltotalPedido()+vlTotal);
+        	pedidoModel.setVltotalPedido(pedidoModel.getVltotalPedido()+vlTotalItem);
         	PedidoItem pedidoItem = mapper.map(pedidoItemResponse, PedidoItem.class);
         	prAdicionados.add(pedidoItem);
         }
@@ -193,13 +199,13 @@ public class PedidoService {
     public Pedido formaPagamento(Pedido pd) {
     	
     	if(pd.getFormaPg().equals(FormaPagamento.BOLETO) || pd.getFormaPg().equals(FormaPagamento.PIX)) {
-    		pd.setDescontoPedido(0.05);
+    		pd.setDescontoPedido(pd.getDescontoPedido() + (pd.getVltotalPedido() * 0.05));
     		pd.setAcrescimoPedido(0);
-    		pd.setVltotalPedido(pd.getVltotalPedido()-(pd.getVltotalPedido()*pd.getDescontoPedido()));
+    		pd.setVltotalPedido(pd.getVltotalPedido() - (pd.getVltotalPedido() * 0.05));
     	}else if(pd.getFormaPg().equals(FormaPagamento.CARTAOCREDITO) || pd.getFormaPg().equals(FormaPagamento.CARTAODEBITO)){
     		pd.setAcrescimoPedido(0.05);
     		pd.setDescontoPedido(0);
-    		pd.setVltotalPedido(pd.getVltotalPedido()+(pd.getVltotalPedido()*pd.getAcrescimoPedido()));
+    		pd.setVltotalPedido(pd.getVltotalPedido() + (pd.getVltotalPedido()*pd.getAcrescimoPedido()));
     	}
 	
     	return pd;

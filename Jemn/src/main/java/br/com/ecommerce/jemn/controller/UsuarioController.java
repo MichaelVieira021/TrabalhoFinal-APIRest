@@ -3,6 +3,7 @@ package br.com.ecommerce.jemn.controller;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -27,12 +28,14 @@ public class UsuarioController {
 	@Autowired
 	private UsuarioService usuarioService;
 	
-	@GetMapping
+	@GetMapping//ADMIN
+	@PreAuthorize("hasAuthority('ADMIN')")
 	public ResponseEntity<List<UsuarioResponseDTO>> obterTodos(){
 		return ResponseEntity.ok(usuarioService.obterTodos());
 	}
 	
 	@GetMapping("/{id}")
+	@PreAuthorize("hasAuthority('ADMIN')")
 	public ResponseEntity<UsuarioResponseDTO> obterPorId(@PathVariable Long id){
 		return ResponseEntity.ok(usuarioService.obterPorId(id));
 	}
@@ -43,17 +46,19 @@ public class UsuarioController {
 	}
 	
 	@PutMapping("/{id}")
+	@PreAuthorize("hasAuthority('ADMIN')")
 	public ResponseEntity<UsuarioResponseDTO> atualizar(@PathVariable Long id, @RequestBody UsuarioRequestDTO usuarioRequest){
 		return ResponseEntity.status(200).body(usuarioService.atualizar(id, usuarioRequest));
 	}
 	
 	@DeleteMapping("/{id}")
+	@PreAuthorize("hasAuthority('ADMIN')")
 	public ResponseEntity<?> deletar(@PathVariable Long id){
 		usuarioService.deletar(id);
 		return ResponseEntity.status(204).build();
 	}
 
-	 @PostMapping("/login")
+	@PostMapping("/login")
     public ResponseEntity<UsuarioLoginResponseDTO> logar(@RequestBody UsuarioLoginRequestDTO usuariologinRequest){
         
         UsuarioLoginResponseDTO usuarioLogado = usuarioService.logar(usuariologinRequest.getEmail(), usuariologinRequest.getSenha());

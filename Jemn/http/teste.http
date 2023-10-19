@@ -13,30 +13,30 @@ Content-Type: application/json
 #     "perfil": "ADMIN"
 # }
 
-{
-    "nomeUsuario": "Eduardo",
-    "email": "teste@gmail.com",
-    "senha": "654321",
-    "telefone": "219929456288",
-    "perfil": "USUARIO"
-}
+# {
+#     "nomeUsuario": "Eduardo",
+#     "email": "teste@gmail.com",
+#     "senha": "654321",
+#     "telefone": "219929456288",
+#     "perfil": "USUARIO"
+# }
 
 
 ####
 POST http://localhost:8080/ecommerce/usuarios/login
 Content-Type: application/json
 
-# {
-#     "email": "rorivadfg7@gmail.com",
-#     "senha": "1234567"
-# }
-
 {
-    "email": "teste@gmail.com",
-    "senha": "654321"
+    "email": "rorivadfg7@gmail.com",
+    "senha": "1234567"
 }
+
+# {
+#     "email": "teste@gmail.com",
+#     "senha": "654321"
+# }
 
 ####
 GET http://localhost:8080/ecommerce/categorias
-Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxIiwiaWF0IjoxNjk3NjkxMzA4LCJleHAiOjE2OTc3Nzc3MDh9.vo6f_-zJB3sQP3_7-7Adl260uFmDOGORrzhWvN55Tbg
-//Authorization: "Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIyIiwiaWF0IjoxNjk3NjkxNDc4LCJleHAiOjE2OTc3Nzc4Nzh9.m6jw9drhtU-6Dw5pq2G2k0_XN4XyxXt8OP4cHWnfViE"
+//Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxIiwiaWF0IjoxNjk3NzM5MTM4LCJleHAiOjE2OTc4MjU1Mzh9.4x2PKAQvB58HBqKBdbd44_4bJpYJGf7GcOaMoU6tpMo
+//Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIyIiwiaWF0IjoxNjk3NzM5MjQzLCJleHAiOjE2OTc4MjU2NDN9.kIwbRNgu2lOZxebzaEla73M5bWVND0QwSZXENuZ8Y5U

@@ -83,6 +83,7 @@ public class ProdutoService {
 
 	public ProdutoResponseDTO atualizar(Long id, ProdutoRequestDTO produtoRequest){
 		obterPorId(id);
+		
 		Produto produtoModel = mapper.map(produtoRequest, Produto.class);
 		produtoModel.setId(id);
 		produtoModel = produtoRepository.save(produtoModel);

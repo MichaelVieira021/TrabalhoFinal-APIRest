@@ -61,7 +61,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         http
             .cors().and().csrf().disable()
             //  .exceptionHandling().authenticationEntryPoint((req, rsp, e) -> rsp.sendError(401))
-            .exceptionHandling()
+            .exceptionHandling().authenticationEntryPoint(new RestAuthenticationEntryPoint())
             .and()
             .sessionManagement()
             .sessionCreationPolicy(SessionCreationPolicy.STATELESS)

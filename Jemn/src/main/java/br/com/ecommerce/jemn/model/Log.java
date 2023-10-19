@@ -13,30 +13,41 @@ import com.fasterxml.jackson.annotation.JsonBackReference;
 @Entity
 public class Log {
     
+   //#region propriedades
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "idLog")
     private Long Id;
 
     @Column
-    private String tipo;
+    private ETipoEntidade tipo;
+
+    @Column(nullable = false)
+    private String acao;
 
     @Column(nullable = false)
     private Date data;
 
     @Column(nullable = false)
-    private double vlOriginal;
+    private String vlOriginal;
 
     @Column(nullable = false)
-    private double vlAtual;
+    private String vlAtual;
 
     @ManyToOne
     @JoinColumn(name = "idUsuario", nullable = false)
     @JsonBackReference
     private Usuario usuario;
     
-    public Log() {
-    	this.data = new Date();
+    //#endregion
+
+    public Log(ETipoEntidade tipo, String acao,String vlOriginal, String vlAtual,Usuario usuario) {
+        this.tipo = tipo;
+        this.acao = acao;
+        this.data = new Date();
+        this.vlOriginal = vlOriginal;
+        this.vlAtual = vlAtual;
+        this.usuario = usuario;
     }
 
     public Long getId() {
@@ -47,14 +58,22 @@ public class Log {
         Id = id;
     }
 
-    public String getTipo() {
+    public ETipoEntidade getTipo() {
         return tipo;
     }
 
-    public void setTipo(String tipo) {
+    public void setTipo(ETipoEntidade tipo) {
         this.tipo = tipo;
     }
 
+    public String getAcao() {
+        return acao;
+    }
+
+    public void setAcao(String acao) {
+        this.acao = acao;
+    }
+   
     public Date getData() {
         return data;
     }
@@ -63,21 +82,28 @@ public class Log {
         this.data = data;
     }
 
-    public double getVlOriginal() {
+    public String getVlOriginal() {
         return vlOriginal;
     }
 
-    public void setVlOriginal(double vlOriginal) {
+    public void setVlOriginal(String vlOriginal) {
         this.vlOriginal = vlOriginal;
     }
 
-    public double getVlAtual() {
+    public String getVlAtual() {
         return vlAtual;
     }
 
-    public void setVlAtual(double vlAtual) {
+    public void setVlAtual(String vlAtual) {
         this.vlAtual = vlAtual;
     }
-    
+
+    public Usuario getUsuario() {
+        return usuario;
+    }
+
+    public void setUsuario(Usuario usuario) {
+        this.usuario = usuario;
+    }
 
 }

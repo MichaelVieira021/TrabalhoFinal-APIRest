@@ -75,19 +75,54 @@ public class CategoriaService {
 	
 	public CategoriaResponseDTO atualizar(Long id, CategoriaRequestDTO categoriaRequest){
 		
-		obterPorId(id);
+	
+		var categoriaRegistro = obterPorId(id);
 		
 		Categoria categoriaModel = mapper.map(categoriaRequest, Categoria.class);
 		categoriaModel.setId(id);
 		categoriaModel = categoriaRepository.save(categoriaModel);
+
+		try {
+            
+            // Pegando o usuario authenticado para auditoria
+            Usuario usuario = (Usuario) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        
+            Log log = new Log(
+            ETipoEntidade.CATEGORIA,
+            "ATUALIZACAO", 
+            new ObjectMapper().writeValueAsString(categoriaRegistro),
+			new ObjectMapper().writeValueAsString(categoriaModel),
+            usuario);
+
+            logService.registrarLog(log);
+
+        } catch (Exception e) {
+            
+        }
 		
 		return mapper.map(categoriaModel, CategoriaResponseDTO.class);
 	}
 	
 	public void deletar(Long id) {
 		
-		obterPorId(id);
+		Usuario usuario = (Usuario) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+	
+		var registroDelete = obterPorId(id);
 		
 		categoriaRepository.deleteById(id);
+
+		try {
+			Log log = new Log(
+				ETipoEntidade.CATEGORIA,
+				"DELETE",
+				"",
+				new ObjectMapper().writeValueAsString(registroDelete),
+				usuario);
+
+				logService.registrarLog(log);
+			
+		} catch (Exception e) {
+			
+		}
 	}
 }

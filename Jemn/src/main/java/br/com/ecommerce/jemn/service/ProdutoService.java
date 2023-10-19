@@ -111,6 +111,7 @@ public class ProdutoService {
 		var produtoRegistro = obterPorId(id);
 
 		obterPorId(id);
+		
 		Produto produtoModel = mapper.map(produtoRequest, Produto.class);
 		produtoModel.setId(id);
 		produtoModel = produtoRepository.save(produtoModel);

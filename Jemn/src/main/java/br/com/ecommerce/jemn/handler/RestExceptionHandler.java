@@ -45,7 +45,7 @@ public class RestExceptionHandler {
         return new ResponseEntity<>(erro, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
-      @ExceptionHandler(BadCredentialsException.class)
+    @ExceptionHandler(BadCredentialsException.class)
     public ResponseEntity<ErrorResposta> handlerBadCredentialsException(Exception ex){
 
         String data = ConversorData.converterDateParaDataHora(new Date());

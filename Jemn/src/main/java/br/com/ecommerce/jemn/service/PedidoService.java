@@ -180,9 +180,7 @@ public class PedidoService {
 		html.append("</style>");
 
 		html.append("<div style=\"text-align: center;\">");
-		
-		
-		//html.append("<img src=\"https://i.postimg.cc/zXR844bs/imagem-2023-10-19-000841048.png\" alt=\"imagem-2023-10-18-235948700\" border=\"0\" style=\"margin: 0 auto; max-width: 900px;\">");
+			
 		html.append("<img src=\"https://i.postimg.cc/9M34LBwG/logook.png\" alt=\"imagem-2023-10-18-235948700\" border=\"0\" height:170px; width:250px;\">");
 		html.append("<h1 style=\"color:#292325\">Olá!</h1>");
 		html.append("<table style=\"border-collapse: collapse;\">");
@@ -206,7 +204,6 @@ public class PedidoService {
 		html.append("</table>");
 
 		html.append("<h1 style=\"color:green\">Valor total do pedido: R$" + pedido.getVltotalPedido() + "</h1>");
-		//html.append("<h1>"  + "VALOR TOTAL DO PEDIDO:" + " " + "R$" + pedido.getVltotalPedido() + "</h1>");
 		
 		// Rodape do HTML
 		html.append("<p><h3 style=\"color:#292325\">Obrigado por sua compra! 🥰</h3></p>");

@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -25,11 +26,13 @@ public class PedidoItemController {
 	private PedidoItemService pedidoItemService;
 
 	@GetMapping
+	@PreAuthorize("hasAuthority('ADMIN')")
 	public ResponseEntity<List<PedidoItemResponseDTO>> obterTodos(){
 		return ResponseEntity.ok(pedidoItemService.obterTodos());
 	}
 
 	@GetMapping("/{id}")
+	@PreAuthorize("hasAuthority('ADMIN')")
 	public ResponseEntity<PedidoItemResponseDTO> obterPorId(@PathVariable Long id){
 		return ResponseEntity.ok(pedidoItemService.obterPorId(id));
 	}
@@ -40,11 +43,13 @@ public class PedidoItemController {
 	}
 
 	@PutMapping("/{id}")
+	@PreAuthorize("hasAuthority('ADMIN')")
 	public ResponseEntity<PedidoItemResponseDTO> atualizar(@PathVariable Long id, @RequestBody PedidoItemRequestDTO pedidoItemRequest){
 		return ResponseEntity.status(200).body(pedidoItemService.atualizar(id, pedidoItemRequest));
 	}
 
 	@DeleteMapping("/{id}")
+	@PreAuthorize("hasAuthority('ADMIN')")
 	public ResponseEntity<?> deletar(@PathVariable Long id){
 		pedidoItemService.deletar(id);
 		return ResponseEntity.status(204).build();

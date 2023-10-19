@@ -24,28 +24,29 @@ public class CategoriaController {
 	private CategoriaService categoriaService;
 	
 	@GetMapping
-	@PreAuthorize("hasAuthority('ADMIN')")
 	public ResponseEntity<List<CategoriaResponseDTO>> obterTodos(){
 		return ResponseEntity.ok(categoriaService.obterTodos());
 	}
 	
 	@GetMapping("/{id}")
-	@PreAuthorize("hasAuthority('USUARIO')")
 	public ResponseEntity<CategoriaResponseDTO> obterPorId(@PathVariable Long id){
 		return ResponseEntity.ok(categoriaService.obterPorId(id));
 	}
 	
 	@PostMapping
+	@PreAuthorize("hasAuthority('ADMIN')")
 	public ResponseEntity<CategoriaResponseDTO> adicionar(@RequestBody CategoriaRequestDTO categoriaRequest){
 		return ResponseEntity.status(201).body(categoriaService.adicionar(categoriaRequest));
 	}
 	
 	@PutMapping("/{id}")
+	@PreAuthorize("hasAuthority('ADMIN')")
 	public ResponseEntity<CategoriaResponseDTO> atualizar(@PathVariable Long id, @RequestBody CategoriaRequestDTO categoriaRequest){
 		return ResponseEntity.status(200).body(categoriaService.atualizar(id, categoriaRequest));
 	}
 	
 	@DeleteMapping("/{id}")
+	@PreAuthorize("hasAuthority('ADMIN')")
 	public ResponseEntity<?> deletar(@PathVariable Long id){
 		categoriaService.deletar(id);
 		return ResponseEntity.status(204).build();

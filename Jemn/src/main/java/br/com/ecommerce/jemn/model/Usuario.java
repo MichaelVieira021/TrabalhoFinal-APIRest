@@ -1,8 +1,11 @@
 package br.com.ecommerce.jemn.model;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -11,6 +14,7 @@ import javax.persistence.Id;
 import javax.persistence.OneToMany;
 
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 @Entity
@@ -112,9 +116,16 @@ public class Usuario implements UserDetails{
     
     //#endregion
 
-    @Override
+     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-       return null;
+       List<String> perfis = new ArrayList<>();
+       perfis.add(perfil.toString());
+
+      // Converter a lista de perfis em uma lista de Authorities
+      return perfis.stream()
+        .map(perfil -> new SimpleGrantedAuthority(perfil))
+        // .map(SimpleGrantedAuthority::new)
+        .collect(Collectors.toList());
     }
 
     @Override

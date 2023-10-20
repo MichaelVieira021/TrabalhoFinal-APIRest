@@ -11,7 +11,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
-
 import br.com.ecommerce.jemn.dto.pedido.PedidoRequestDTO;
 import br.com.ecommerce.jemn.dto.pedido.PedidoResponseDTO;
 import br.com.ecommerce.jemn.dto.pedidoItem.PedidoItemRequestDTO;
@@ -25,7 +24,7 @@ import br.com.ecommerce.jemn.model.email.Email;
 import br.com.ecommerce.jemn.repository.PedidoRepository;
 
 @Service
-public class PedidoService {
+public class PedidoService { 
 
 	@Autowired
 	private EmailService emailService;
@@ -57,33 +56,27 @@ public class PedidoService {
 	public PedidoResponseDTO obterPorId(Long id) {
 		Optional<Pedido> optPedido = pedidoRepository.findById(id);
 		
+		if(optPedido.isEmpty()){
+            throw new RuntimeException("Nenhum registro encontrado para o ID: " + id);
+        }
+		
 		return mapper.map(optPedido.get(), PedidoResponseDTO.class);
 	}
 
-	
 	@Transactional
 	public PedidoResponseDTO adicionar(PedidoRequestDTO pedidoRequest){
-	        
-		PedidoResponseDTO teste = mapper.map(pedidoRequest, PedidoResponseDTO.class);
-		teste.setVltotalPedido(0);
-		teste.setUsuario(mapper.map(usuarioService.obterPorId(teste.getUsuario().getId()), UsuarioResponseDTO.class));
-		Pedido pedidoModel = mapper.map(teste, Pedido.class);
-		
-		pedidoModel = pedidoRepository.save(pedidoModel);
+		pedidoRequest.setUsuario(mapper.map(usuarioService.obterPorId(pedidoRequest.getUsuario().getId()), UsuarioResponseDTO.class));
+		Pedido pedidoModel = pedidoRepository.save(mapper.map(pedidoRequest, Pedido.class));
 		
 		List<PedidoItem> pedidoItens = adicionarPedidoItens(pedidoRequest.getPedidoItens(), pedidoModel);
 		pedidoModel.setPedidoItens(pedidoItens);
 		
 		formaPagamento(pedidoModel);
-
 		pedidoModel = pedidoRepository.save(pedidoModel);
-		
-		testeEnvioDeEmail(pedidoModel);
+		envioDeEmail(pedidoModel);
 		
 		return mapper.map(pedidoModel, PedidoResponseDTO.class);
 	}
-	
-	
 
 	public PedidoResponseDTO atualizar(Long id, PedidoRequestDTO pedidoRequest){
 		obterPorId(id);
@@ -100,55 +93,55 @@ public class PedidoService {
 	}
 	
     private List<PedidoItem> adicionarPedidoItens(List<PedidoItemRequestDTO> pedidoItemRequest, Pedido pedidoModel){
-        
         List<PedidoItem> prAdicionados = new ArrayList<>();
 
         for(PedidoItemRequestDTO pdoItemRequest : pedidoItemRequest){
-        	pdoItemRequest.setPedido(mapper.map(pedidoModel, PedidoResponseDTO.class));
-        	
-        	ProdutoResponseDTO prResponse = produtoService.obterPorId(pdoItemRequest.getProduto().getId());	
-        	pdoItemRequest.setProduto(prResponse);
         	PedidoItemResponseDTO pedidoItemResponse = mapper.map(pdoItemRequest, PedidoItemResponseDTO.class);
+        	pedidoItemResponse.setPedido(mapper.map(pedidoModel, PedidoResponseDTO.class));
         	
+        	ProdutoResponseDTO prResponse = produtoService.obterPorId(pedidoItemResponse.getProduto().getId());	
+        	pedidoItemResponse.setProduto(prResponse);
+
+        	//CONTROLE DE ESTOQUE
 			if (pedidoItemResponse.getQtdPedidoitem() > pedidoItemResponse.getProduto().getQtdProduto()){
  				throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Quantidade solicitada é maior que a quantidade em estoque");			
 			}
 
+			double vlTotalBruto = pedidoItemResponse.getProduto().getVlProduto() * pedidoItemResponse.getQtdPedidoitem();
+			//PROMOÇÃO ATACADISTA
 			if (pedidoItemResponse.getQtdPedidoitem() >= 5){
-				pedidoItemResponse.setDescontoItem((pedidoItemResponse.getProduto().getVlProduto() * pedidoItemResponse.getQtdPedidoitem()) * 0.05);
+				pedidoItemResponse.setDescontoItem(vlTotalBruto * 0.05);
 				pedidoModel.setDescontoPedido(pedidoModel.getDescontoPedido() + pedidoItemResponse.getDescontoItem());
 			}
 
-			double vlTotalItem = ((pedidoItemResponse.getProduto().getVlProduto() * pedidoItemResponse.getQtdPedidoitem()) - pedidoItemResponse.getDescontoItem() + pedidoItemResponse.getAcrecimoItem());
+			double vlTotalItem = vlTotalBruto - pedidoItemResponse.getDescontoItem() + pedidoItemResponse.getAcrecimoItem();
         	pedidoItemResponse.setVltotalItem(vlTotalItem);
-        	pedidoItemResponse =  pedidoItemService.adicionar(mapper.map(pedidoItemResponse, PedidoItemRequestDTO.class));
         	pedidoModel.setVltotalPedido(pedidoModel.getVltotalPedido()+vlTotalItem);
-        	PedidoItem pedidoItem = mapper.map(pedidoItemResponse, PedidoItem.class);
-        	prAdicionados.add(pedidoItem);
+        	
+        	pedidoItemResponse =  pedidoItemService.adicionar(mapper.map(pedidoItemResponse, PedidoItemRequestDTO.class));
+        	prAdicionados.add(mapper.map(pedidoItemResponse, PedidoItem.class));
         }
+        return prAdicionados;	
+    }
+    
+    private Pedido formaPagamento(Pedido pd) {
 
-        return prAdicionados;
-
-		
+    	if(pd.getFormaPg().equals(FormaPagamento.BOLETO) || pd.getFormaPg().equals(FormaPagamento.PIX)) {
+    		pd.setDescontoPedido(pd.getDescontoPedido() + (pd.getVltotalPedido() * 0.05));
+    		pd.setVltotalPedido(pd.getVltotalPedido() - (pd.getVltotalPedido() * 0.05));
+    		
+    	}else if(pd.getFormaPg().equals(FormaPagamento.CARTAOCREDITO) || pd.getFormaPg().equals(FormaPagamento.CARTAODEBITO)){
+    		pd.setAcrescimoPedido(pd.getAcrescimoPedido() + (pd.getVltotalPedido() * 0.05));
+    		pd.setVltotalPedido(pd.getVltotalPedido() + (pd.getVltotalPedido()* 0.05));
+    	}
+    	return pd;
     }
 
-	public ResponseEntity<?> testeEnvioDeEmail(Pedido pedido) {
-
-        //List<String> destinatarios = new ArrayList<>();
-        //destinatarios.add("janieltonmedeiros@outlook.com");
-
+	public ResponseEntity<?> envioDeEmail(Pedido pedido) {
 		String destinatario = pedido.getUsuario().getEmail();
-        // Obtém todos os pedidos
-        //List<PedidoResponseDTO> pedidos = pedidoService.obterTodos();
-
-        // Gera o HTML com os dados dos pedidos
-        String mensagem = gerarHTMLComDadosDosPedidos(pedido);
-
-        // Cria o email
-        Email email = new Email("RESUMO PEDIDO JEMN", mensagem, "elton.medeiros14@gmail.com", destinatario);
-
-        // Envia o email
-        emailService.enviar(email);
+		String mensagem = gerarHTMLComDadosDosPedidos(pedido);
+		Email email = new Email("RESUMO PEDIDO JEMN", mensagem, "elton.medeiros14@gmail.com", destinatario);
+		emailService.enviar(email);
 
         return ResponseEntity.status(200).body("E-mail enviado com sucesso!!!");
     }
@@ -157,6 +150,7 @@ public class PedidoService {
 	StringBuilder html = new StringBuilder();
 
 		// Tabela com os dados dos pedidos
+
 		html.append("<style>");
 		html.append("table {");
 		html.append("border-collapse: collapse;");
@@ -210,20 +204,8 @@ public class PedidoService {
 		// Rodape do HTML
 		html.append("<p><h3 style=\"color:#292325\">Obrigado por sua compra! 🥰</h3></p>");
 
-
         return html.toString();
     }
     
-    public Pedido formaPagamento(Pedido pd) {
-    	
-    	if(pd.getFormaPg().equals(FormaPagamento.BOLETO) || pd.getFormaPg().equals(FormaPagamento.PIX)) {
-    		pd.setDescontoPedido(pd.getDescontoPedido() + (pd.getVltotalPedido() * 0.05));
-    		pd.setVltotalPedido(pd.getVltotalPedido() - (pd.getVltotalPedido() * 0.05));
-    	}else if(pd.getFormaPg().equals(FormaPagamento.CARTAOCREDITO) || pd.getFormaPg().equals(FormaPagamento.CARTAODEBITO)){
-    		pd.setAcrescimoPedido(pd.getAcrescimoPedido() + (pd.getVltotalPedido() * 0.05));
-    		pd.setVltotalPedido(pd.getVltotalPedido() + (pd.getVltotalPedido()* 0.05));
-    	}
-	
-    	return pd;
-    }
+
 }

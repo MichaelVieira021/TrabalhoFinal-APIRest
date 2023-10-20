@@ -13,6 +13,7 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
@@ -30,7 +31,7 @@ import br.com.ecommerce.jemn.model.Usuario;
 import br.com.ecommerce.jemn.repository.ProdutoRepository;
 
 @Service
-public class ProdutoService {
+public class ProdutoService { 
 
 	@Autowired
 	private ProdutoRepository produtoRepository;
@@ -48,26 +49,30 @@ public class ProdutoService {
 		List<Produto> produtos = produtoRepository.findAll();
 		
 		return produtos
-				.stream()
-				.filter(produto -> produto.isAtivo())
-				.map(produto -> mapper.map(produto, ProdutoResponseDTO.class))
-				.collect(Collectors.toList());
+			.stream()
+			.filter(produto -> produto.isAtivo())
+			.filter(cat -> cat.getCategoria().isAtivo())
+			.map(produto -> mapper.map(produto, ProdutoResponseDTO.class))
+			.collect(Collectors.toList());
 	}
 
 	public ProdutoResponseDTO obterPorId(Long id) {
 		Optional<Produto> optProduto = produtoRepository.findById(id);
 		
+		if(optProduto.isEmpty() || mapper.map(optProduto, Produto.class).isAtivo() == false || mapper.map(optProduto, Produto.class).getCategoria().isAtivo() == false){
+            throw new RuntimeException("Nenhum registro encontrado para o ID: " + id);
+        }
+		
 		return mapper.map(optProduto.get(), ProdutoResponseDTO.class);
 	}
 	
 	public List<ProdutoResponseDTO> obterPorCategoria(Long id) {
-		List<Produto> produtos = produtoRepository.findAll();
-		
+		List<ProdutoResponseDTO> produtos = obterTodos();
 		List<Produto> prs = new ArrayList<>();
 		
-		for(Produto pr : produtos) {
+		for(ProdutoResponseDTO pr : produtos) {
 			if(pr.getCategoria().getId() == id){
-				prs.add(pr);
+				prs.add(mapper.map(pr, Produto.class));
 			}
 		}
 		return prs
@@ -76,49 +81,79 @@ public class ProdutoService {
 				.map(produto -> mapper.map(produto, ProdutoResponseDTO.class))
 				.collect(Collectors.toList());
 	}
-
-	public ProdutoResponseDTO adicionar(ProdutoRequestDTO produtoRequest){
+	
+	
+	//APENAS ADMIN---------------------------------------------------------
+	public List<ProdutoResponseDTO> obterTodosADMIN(){
+		List<Produto> produtos = produtoRepository.findAll();
 		
-		Usuario usuario = (Usuario) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+		return produtos
+			.stream()
+			.map(produto -> mapper.map(produto, ProdutoResponseDTO.class))
+			.collect(Collectors.toList());
+	}
 
-		Long i = produtoRequest.getCategoria().getId();
-		CategoriaResponseDTO categoriaResponse = categoriaService.obterPorId(i);		
-		produtoRequest.setCategoria(mapper.map(categoriaResponse, Categoria.class));
+	public ProdutoResponseDTO obterPorIdADMIN(Long id) {
+		Optional<Produto> optProduto = produtoRepository.findById(id);
+		
+		if(optProduto.isEmpty()){
+            throw new RuntimeException("Nenhum registro encontrado para o ID: " + id);
+        }
+		
+		return mapper.map(optProduto.get(), ProdutoResponseDTO.class);
+	}
+	
+	public List<ProdutoResponseDTO> obterPorCategoriaADMIN(Long id) {
+		List<ProdutoResponseDTO> produtos = obterTodosADMIN();
+		List<Produto> prs = new ArrayList<>();
+		
+		for(ProdutoResponseDTO pr : produtos) {
+			if(pr.getCategoria().getId() == id){
+				prs.add(mapper.map(pr, Produto.class));
+			}
+		}
+		return prs
+			.stream()
+			.map(produto -> mapper.map(produto, ProdutoResponseDTO.class))
+			.collect(Collectors.toList());
+	}
+
+	@Transactional
+	public ProdutoResponseDTO adicionar(ProdutoRequestDTO produtoRequest){
+		CategoriaResponseDTO categoriaResponse = categoriaService.obterPorIdADMIN(produtoRequest.getCategoria().getId());		
+		produtoRequest.setCategoria(categoriaResponse);
 		Produto produtoModel = mapper.map(produtoRequest, Produto.class);
-		produtoModel.setAtivo(true);
-
 		produtoModel = produtoRepository.save(produtoModel);
 
 		try {
+			Usuario usuario = (Usuario) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+			
 			Log log = new Log(
 				ETipoEntidade.PRODUTO,
 				"CADASTRO",
 				"",
 				new ObjectMapper().writeValueAsString(produtoModel),
-				usuario);
+				usuario
+				);
 
 				logService.registrarLog(log);
 			
 		} catch (Exception e) {
-			
+			throw new RuntimeException("Ocorreu um erro ao adicionar o produto: " + e.getMessage());
 		}
 		
 		return mapper.map(produtoModel, ProdutoResponseDTO.class);
 	}
 
+	@Transactional
 	public ProdutoResponseDTO atualizar(Long id, ProdutoRequestDTO produtoRequest){
-
 		var produtoRegistro = obterPorId(id);
-
-		obterPorId(id);
-		
 		Produto produtoModel = mapper.map(produtoRequest, Produto.class);
 		produtoModel.setId(id);
+		produtoModel.setAtivo(produtoRegistro.isAtivo());
 		produtoModel = produtoRepository.save(produtoModel);
 
 		try {
-            
-            // Pegando o usuario authenticado para auditoria
             Usuario usuario = (Usuario) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         
             Log log = new Log(
@@ -126,56 +161,58 @@ public class ProdutoService {
             "ATUALIZACAO", 
             new ObjectMapper().writeValueAsString(produtoRegistro),
 			new ObjectMapper().writeValueAsString(produtoModel),
-            usuario);
+            usuario
+            );
 
             logService.registrarLog(log);
 
         } catch (Exception e) {
-            
+        	throw new RuntimeException("Ocorreu um erro ao atualizar o produto: " + e.getMessage());
         }
-		
-		
 		return mapper.map(produtoModel, ProdutoResponseDTO.class);
 	}
 
+	@Transactional
 	public void deletar(Long id) {
-
-		Usuario usuario = (Usuario) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-
 		var registroDelete = obterPorId(id);
 		produtoRepository.deleteById(id);
 
 		try {
+			Usuario usuario = (Usuario) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
 			Log log = new Log(
 				ETipoEntidade.PRODUTO,
 				"DELETE",
 				new ObjectMapper().writeValueAsString(registroDelete),
 				"",
-				usuario);
+				usuario
+				);
 				
 				logService.registrarLog(log);
 			
 		} catch (Exception e) {
-			
+			throw new RuntimeException("Ocorreu um erro ao deletar o produto: " + e.getMessage());
 		}
 	}
-
-	public void enviarImagem(@RequestParam("file") MultipartFile file,@PathVariable Long id) throws IOException{
-
-		String diretorio ="C:\\Imagens\\";
+	
+	public ProdutoResponseDTO ativar(Long id) {
+		var prAtual = obterPorIdADMIN(id);
+		prAtual.setAtivo(true);
 		
-		byte[] fileBytes = file.getBytes();
-		String base64File = Base64.getEncoder().encodeToString(fileBytes); 
-		Path nomeFile = Paths.get(diretorio,file.getOriginalFilename());
-		Files.write(nomeFile,file.getBytes());
+		return mapper.map(produtoRepository.save(mapper.map(prAtual, Produto.class)), ProdutoResponseDTO.class);
+	}
+	
+	public ProdutoResponseDTO desativar(Long id) {
+		var prAtual = obterPorIdADMIN(id);
+		prAtual.setAtivo(false);
 		
+		return mapper.map(produtoRepository.save(mapper.map(prAtual, Produto.class)), ProdutoResponseDTO.class);
+	}
 
-		ProdutoResponseDTO produtoEncontrado =  obterPorId(id); 		
-		Produto produtoModel = mapper.map(produtoEncontrado, Produto.class);
+	public void enviarImagem(@RequestParam("imagem") MultipartFile file,@PathVariable Long id) throws IOException{
+		String base64File = Base64.getEncoder().encodeToString(file.getBytes()); 
+		Produto produtoModel = mapper.map(obterPorIdADMIN(id), Produto.class);
 		produtoModel.setFlieBase64(base64File);
-		produtoRepository.save(produtoModel);
-		
-		
-		
+		produtoRepository.save(produtoModel);	
 	}
 }

@@ -5,11 +5,11 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
-
+import org.springframework.transaction.annotation.Transactional;
 import com.fasterxml.jackson.databind.ObjectMapper;
-
 import br.com.ecommerce.jemn.dto.categoria.CategoriaRequestDTO;
 import br.com.ecommerce.jemn.dto.categoria.CategoriaResponseDTO;
 import br.com.ecommerce.jemn.model.Categoria;
@@ -32,86 +32,121 @@ public class CategoriaService {
 	
 	public List<CategoriaResponseDTO> obterTodos(){	
 		
-		List<Categoria> categorias = categoriaRepository.findAll();
+		List<Categoria> categorias = categoriaRepository.findAll(Sort.by(Sort.Order.asc("id")));
 
 		return categorias
-				.stream()
-				.filter(categoria -> categoria.isAtivo())
-				.map(categoria -> mapper.map(categoria, CategoriaResponseDTO.class))
-				.collect(Collectors.toList());	
+			.stream()
+			.filter(categoria -> categoria.isAtivo())
+			.map(categoria -> mapper.map(categoria, CategoriaResponseDTO.class))
+			.collect(Collectors.toList());	
 	}
 	
-	public CategoriaResponseDTO obterPorId(Long id) {
-		
+	public CategoriaResponseDTO obterPorId(Long id){
 		Optional<Categoria> optCategoria = categoriaRepository.findById(id);
+		
+		if(optCategoria.isEmpty() || mapper.map(optCategoria, Categoria.class).isAtivo() == false){
+            throw new RuntimeException("Nenhum registro encontrado para o ID: " + id);
+        }
 		
 		return mapper.map(optCategoria.get(), CategoriaResponseDTO.class);
 	}
 	
-	public CategoriaResponseDTO adicionar(CategoriaRequestDTO categoriaRequest){
-
-		Usuario usuario = (Usuario) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+	
+	//APENAS ADMIN---------------------------------------------------------
+	public List<CategoriaResponseDTO> obterTodosADMIN(){	
 		
+		List<Categoria> categorias = categoriaRepository.findAll(Sort.by(Sort.Order.asc("id")));
+
+		return categorias
+			.stream()
+			.map(categoria -> mapper.map(categoria, CategoriaResponseDTO.class))
+			.collect(Collectors.toList());	
+	}
+	
+	public CategoriaResponseDTO obterPorIdADMIN(Long id){
+		Optional<Categoria> optCategoria = categoriaRepository.findById(id);
+		
+		if(optCategoria.isEmpty()){
+            throw new RuntimeException("Nenhum registro encontrado para o ID: " + id);
+        }
+		
+		return mapper.map(optCategoria.get(), CategoriaResponseDTO.class);
+	}
+	
+	@Transactional
+	public CategoriaResponseDTO adicionar(CategoriaRequestDTO categoriaRequest){
 		Categoria categoriaModel = mapper.map(categoriaRequest, Categoria.class);
-		categoriaModel.setAtivo(true);
 		categoriaModel = categoriaRepository.save(categoriaModel);
 
-		try {
+		try{
+			Usuario usuario = (Usuario) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 			Log log = new Log(
 				ETipoEntidade.CATEGORIA,
 				"CADASTRO",
 				"",
 				new ObjectMapper().writeValueAsString(categoriaModel),
-				usuario);
+				usuario
+				);
 
-				logService.registrarLog(log);
+				logService.registrarLog(log); 
 			
-		} catch (Exception e) {
-			
+		}catch(Exception e){
+	        throw new RuntimeException("Ocorreu um erro ao adicionar a categoria: " + e.getMessage());
 		}
 		
 		return mapper.map(categoriaModel, CategoriaResponseDTO.class);
 	}
 	
+	@Transactional
 	public CategoriaResponseDTO atualizar(Long id, CategoriaRequestDTO categoriaRequest){
-		
-	
 		var categoriaRegistro = obterPorId(id);
-		
 		Categoria categoriaModel = mapper.map(categoriaRequest, Categoria.class);
 		categoriaModel.setId(id);
+		categoriaModel.setAtivo(categoriaRegistro.isAtivo());
 		categoriaModel = categoriaRepository.save(categoriaModel);
 
-		try {
-            
-            // Pegando o usuario authenticado para auditoria
+		try{
             Usuario usuario = (Usuario) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         
             Log log = new Log(
-            ETipoEntidade.CATEGORIA,
-            "ATUALIZACAO", 
-            new ObjectMapper().writeValueAsString(categoriaRegistro),
-			new ObjectMapper().writeValueAsString(categoriaModel),
-            usuario);
-
+	            ETipoEntidade.CATEGORIA,
+	            "ATUALIZACAO", 
+	            new ObjectMapper().writeValueAsString(categoriaRegistro),
+				new ObjectMapper().writeValueAsString(categoriaModel),
+	            usuario
+	            );
+            
             logService.registrarLog(log);
 
-        } catch (Exception e) {
-            
+        }catch(Exception e){
+        	throw new RuntimeException("Ocorreu um erro ao atualizar a categoria: " + e.getMessage());
         }
 		
 		return mapper.map(categoriaModel, CategoriaResponseDTO.class);
 	}
 	
-	public void deletar(Long id) {
+	public CategoriaResponseDTO ativar(Long id){
+		var catAtual = obterPorIdADMIN(id);
+		catAtual.setAtivo(true);
 		
-		Usuario usuario = (Usuario) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+		return mapper.map(categoriaRepository.save(mapper.map(catAtual, Categoria.class)), CategoriaResponseDTO.class);
+	}
 	
-		var registroDelete = obterPorId(id);
+	public CategoriaResponseDTO desativar(Long id){
+		var catAtual = obterPorIdADMIN(id);
+		catAtual.setAtivo(false);
 		
+		return mapper.map(categoriaRepository.save(mapper.map(catAtual, Categoria.class)), CategoriaResponseDTO.class);
+	}
+	
+	@Transactional
+	public void deletar(Long id){
+		var registroDelete = obterPorId(id);
 		categoriaRepository.deleteById(id);
 
-		try {
+		try{
+			Usuario usuario = (Usuario) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+			
 			Log log = new Log(
 				ETipoEntidade.CATEGORIA,
 				"DELETE",
@@ -121,8 +156,8 @@ public class CategoriaService {
 
 				logService.registrarLog(log);
 			
-		} catch (Exception e) {
-			
+		}catch(Exception e){
+			throw new RuntimeException("Ocorreu um erro ao deletar a categoria: " + e.getMessage());
 		}
 	}
 }

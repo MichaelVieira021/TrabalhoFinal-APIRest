@@ -13,7 +13,6 @@ import com.fasterxml.jackson.annotation.JsonBackReference;
 @Entity
 public class Log {
     
-   //#region propriedades
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "idLog")
@@ -28,10 +27,10 @@ public class Log {
     @Column(nullable = false)
     private Date data;
 
-    @Column(nullable = false)
+    @Column(nullable = false, columnDefinition = "TEXT")
     private String vlOriginal;
 
-    @Column(nullable = false)
+    @Column(nullable = false, columnDefinition = "TEXT")
     private String vlAtual;
 
     @ManyToOne
@@ -39,8 +38,6 @@ public class Log {
     @JsonBackReference
     private Usuario usuario;
     
-    //#endregion
-
     public Log(ETipoEntidade tipo, String acao,String vlOriginal, String vlAtual,Usuario usuario) {
         this.tipo = tipo;
         this.acao = acao;
@@ -105,5 +102,4 @@ public class Log {
     public void setUsuario(Usuario usuario) {
         this.usuario = usuario;
     }
-
 }

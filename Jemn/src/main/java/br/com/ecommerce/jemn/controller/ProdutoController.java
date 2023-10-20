@@ -30,7 +30,7 @@ public class ProdutoController {
 
 	@GetMapping
 	public ResponseEntity<List<ProdutoResponseDTO>> obterTodos(){
-		return ResponseEntity.ok(produtoService.obterTodos());
+		return ResponseEntity.ok(produtoService.obterTodos()); 
 	}
 
 	@GetMapping("/{id}")
@@ -41,6 +41,23 @@ public class ProdutoController {
 	@GetMapping("/categoria/{id}")
 	public ResponseEntity<List<ProdutoResponseDTO>> obterPorCategoria(@PathVariable Long id){
 		return ResponseEntity.ok(produtoService.obterPorCategoria(id));
+	}
+	
+	
+	//APENAS ADMIN---------------------------------------------------------
+	@GetMapping("/admin")
+	public ResponseEntity<List<ProdutoResponseDTO>> obterTodosADMIN(){
+		return ResponseEntity.ok(produtoService.obterTodosADMIN()); 
+	}
+
+	@GetMapping("/admin/{id}")
+	public ResponseEntity<ProdutoResponseDTO> obterPorIdADMIN(@PathVariable Long id){
+		return ResponseEntity.ok(produtoService.obterPorIdADMIN(id));
+	}
+	
+	@GetMapping("/categoria/admin/{id}")
+	public ResponseEntity<List<ProdutoResponseDTO>> obterPorCategoriaADMIN(@PathVariable Long id){
+		return ResponseEntity.ok(produtoService.obterPorCategoriaADMIN(id));
 	}
 
 	@PostMapping
@@ -61,10 +78,22 @@ public class ProdutoController {
 		produtoService.deletar(id);
 		return ResponseEntity.status(204).build();
 	}
+	
+	@PutMapping("/ativar/{id}")
+	@PreAuthorize("hasAuthority('ADMIN')")
+	public ResponseEntity<ProdutoResponseDTO> ativar(@PathVariable Long id, @RequestBody ProdutoRequestDTO categoriaRequest){
+		return ResponseEntity.status(200).body(produtoService.ativar(id));
+	}
+	
+	@PutMapping("/desativar/{id}")
+	@PreAuthorize("hasAuthority('ADMIN')")
+	public ResponseEntity<ProdutoResponseDTO> desativar(@PathVariable Long id, @RequestBody ProdutoRequestDTO categoriaRequest){
+		return ResponseEntity.status(200).body(produtoService.desativar(id));
+	}
 
 	@PutMapping("/upload/{id}")
 	@PreAuthorize("hasAuthority('ADMIN')")
-	public ResponseEntity<String> uploadFotoProduto(@RequestParam("file") MultipartFile file,@PathVariable Long id) throws IOException{
+	public ResponseEntity<String> uploadFotoProduto(@RequestParam("imagem") MultipartFile file,@PathVariable Long id) throws IOException{
 		
 		produtoService.enviarImagem(file, id);
 

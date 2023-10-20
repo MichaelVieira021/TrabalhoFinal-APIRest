@@ -2,7 +2,6 @@ package br.com.ecommerce.jemn.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
 import br.com.ecommerce.jemn.model.Log;
 import br.com.ecommerce.jemn.repository.LogRepository;
 

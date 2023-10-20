@@ -33,6 +33,20 @@ public class CategoriaController {
 		return ResponseEntity.ok(categoriaService.obterPorId(id));
 	}
 	
+	
+	//APENAS ADMIN---------------------------------------------------------
+	@GetMapping("/admin")
+	@PreAuthorize("hasAuthority('ADMIN')")
+	public ResponseEntity<List<CategoriaResponseDTO>> obterTodosADMIN(){
+		return ResponseEntity.ok(categoriaService.obterTodosADMIN());
+	}
+	
+	@GetMapping("/admin/{id}")
+	@PreAuthorize("hasAuthority('ADMIN')")
+	public ResponseEntity<CategoriaResponseDTO> obterPorIdADMIN(@PathVariable Long id){
+		return ResponseEntity.ok(categoriaService.obterPorIdADMIN(id));
+	}
+	
 	@PostMapping
 	@PreAuthorize("hasAuthority('ADMIN')")
 	public ResponseEntity<CategoriaResponseDTO> adicionar(@RequestBody CategoriaRequestDTO categoriaRequest){
@@ -43,6 +57,18 @@ public class CategoriaController {
 	@PreAuthorize("hasAuthority('ADMIN')")
 	public ResponseEntity<CategoriaResponseDTO> atualizar(@PathVariable Long id, @RequestBody CategoriaRequestDTO categoriaRequest){
 		return ResponseEntity.status(200).body(categoriaService.atualizar(id, categoriaRequest));
+	}
+	
+	@PutMapping("/ativar/{id}")
+	@PreAuthorize("hasAuthority('ADMIN')")
+	public ResponseEntity<CategoriaResponseDTO> ativar(@PathVariable Long id, @RequestBody CategoriaRequestDTO categoriaRequest){
+		return ResponseEntity.status(200).body(categoriaService.ativar(id));
+	}
+	
+	@PutMapping("/desativar/{id}")
+	@PreAuthorize("hasAuthority('ADMIN')")
+	public ResponseEntity<CategoriaResponseDTO> desativar(@PathVariable Long id, @RequestBody CategoriaRequestDTO categoriaRequest){
+		return ResponseEntity.status(200).body(categoriaService.desativar(id));
 	}
 	
 	@DeleteMapping("/{id}")

@@ -1,6 +1,5 @@
 package br.com.ecommerce.jemn.controller;
 
-
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,9 +24,6 @@ public class PedidoController {
 
 	@Autowired
 	private PedidoService pedidoService;
-
-	//@Autowired
-	//private EmailService emailService;
 
 	@GetMapping
 	@PreAuthorize("hasAuthority('ADMIN')")
@@ -58,6 +54,5 @@ public class PedidoController {
 		pedidoService.deletar(id);
 		return ResponseEntity.status(204).build();
 	}
-
 }
 

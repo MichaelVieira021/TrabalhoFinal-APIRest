@@ -1,6 +1,6 @@
 package br.com.ecommerce.jemn.dto.produto;
 
-import br.com.ecommerce.jemn.model.Categoria;
+import br.com.ecommerce.jemn.dto.categoria.CategoriaResponseDTO;
 
 public class ProdutoRequestDTO {
 	
@@ -8,14 +8,18 @@ public class ProdutoRequestDTO {
     private String obsProduto;
     private double vlProduto;
     private Integer qtdProduto;
-    private Categoria categoria;
+    private CategoriaResponseDTO categoria;
     private boolean ativo;
-    
-    public Categoria getCategoria() {
+
+    public ProdutoRequestDTO() {
+		this.ativo = true;
+	}
+
+	public CategoriaResponseDTO getCategoria() {
         return categoria;
     }
 
-    public void setCategoria(Categoria idCategoria) {
+    public void setCategoria(CategoriaResponseDTO idCategoria) {
         this.categoria = idCategoria;
     }
 
@@ -51,13 +55,11 @@ public class ProdutoRequestDTO {
         this.qtdProduto = qtdProduto;
     }
 
-    public boolean isAtivo() {
-        return ativo;
-    }
+	public boolean isAtivo() {
+		return ativo;
+	}
 
-    public void setAtivo(boolean ativo) {
-        this.ativo = ativo;
-    }
-
-    
+	public void setAtivo(boolean ativo) {
+		this.ativo = ativo;
+	}
 }

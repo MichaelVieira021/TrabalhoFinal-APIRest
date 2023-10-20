@@ -5,8 +5,14 @@ public class CategoriaRequestDTO {
     private String nomeCategoria;
     private String obsCategoria;
     private boolean ativo;
+    
+    
 
-    public String getNomeCategoria() {
+    public CategoriaRequestDTO() {
+		this.ativo = true;
+	}
+
+	public String getNomeCategoria() {
         return nomeCategoria;
     }
 

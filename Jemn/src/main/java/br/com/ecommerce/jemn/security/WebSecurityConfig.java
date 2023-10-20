@@ -78,6 +78,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
             .permitAll()// informo que todos podem acessar esses endpoints sem autenticação.
             .antMatchers(HttpMethod.GET, "/ecommerce/produtos/**", "/ecommerce/categorias/**")
             .permitAll()
+            .antMatchers("/swagger-ui/**", "/v3/api-docs/**", "/v3/api-docs", "/webjars/**")
+            .permitAll()
             .anyRequest()
             // .permitAll();
             .authenticated(); // Digo que qualquer outro endpoint não maapeado acima deve cobrar autenticação.

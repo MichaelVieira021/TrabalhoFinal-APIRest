@@ -116,7 +116,7 @@ public class Usuario implements UserDetails{
     
     //#endregion
 
-     @Override
+    @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
        List<String> perfis = new ArrayList<>();
        perfis.add(perfil.toString());

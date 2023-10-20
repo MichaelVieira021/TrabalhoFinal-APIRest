@@ -149,10 +149,10 @@ public class ProdutoService {
 			Log log = new Log(
 				ETipoEntidade.PRODUTO,
 				"DELETE",
-				"",
 				new ObjectMapper().writeValueAsString(registroDelete),
+				"",
 				usuario);
-
+				
 				logService.registrarLog(log);
 			
 		} catch (Exception e) {

@@ -115,11 +115,11 @@ public class PedidoService {
 			}
 
 			if (pedidoItemResponse.getQtdPedidoitem() >= 5){
-				pedidoItemResponse.setDescontoItem((pedidoItemResponse.getProduto().getVlProduto()* pedidoItemResponse.getQtdPedidoitem())* 0.05);
+				pedidoItemResponse.setDescontoItem((pedidoItemResponse.getProduto().getVlProduto() * pedidoItemResponse.getQtdPedidoitem()) * 0.05);
 				pedidoModel.setDescontoPedido(pedidoModel.getDescontoPedido() + pedidoItemResponse.getDescontoItem());
 			}
 
-			double vlTotalItem = (pedidoItemResponse.getProduto().getVlProduto() - pedidoItemResponse.getDescontoItem() + pedidoItemResponse.getAcrecimoItem()) * pedidoItemResponse.getQtdPedidoitem();
+			double vlTotalItem = ((pedidoItemResponse.getProduto().getVlProduto() * pedidoItemResponse.getQtdPedidoitem()) - pedidoItemResponse.getDescontoItem() + pedidoItemResponse.getAcrecimoItem());
         	pedidoItemResponse.setVltotalItem(vlTotalItem);
         	pedidoItemResponse =  pedidoItemService.adicionar(mapper.map(pedidoItemResponse, PedidoItemRequestDTO.class));
         	pedidoModel.setVltotalPedido(pedidoModel.getVltotalPedido()+vlTotalItem);
@@ -160,7 +160,7 @@ public class PedidoService {
 		html.append("<style>");
 		html.append("table {");
 		html.append("border-collapse: collapse;");
-		html.append("width: 100%;");
+		html.append("width: 100%; margin: 0 20px 0 20px");
 		html.append("}");
 
 		html.append("th, td {");
@@ -188,16 +188,18 @@ public class PedidoService {
 		html.append("<th>PRODUTOS COMPRADOS</th>");
 		html.append("<th>QUANTIDADE</th>");
 		html.append("<th>VALOR TOTAL DOS PRODUTOS</th>");
+		html.append("<th>VALOR TOTAL COM DESCONTO</th>");
 		html.append("</tr>");
 
 	
-		html.append("<h1 style=\"color:#292325\">" +  pedido.getUsuario().getNomeUsuario() +  "," +"  " + "seu pedido de Nº " + pedido.getId() + " "  + "foi finalizado com sucesso!"  + "</h1>");
+		html.append("<h1 style=\"color:#292325\">" +  pedido.getUsuario().getNomeUsuario() +  "," +"  " + "seu pedido de Nº " + pedido.getId() + " " + "pago via " +  pedido.getFormaPg() + " " + "foi finalizado com sucesso!"  + "</h1>");
 		html.append("<br>");
 		
 		for (PedidoItem pedidoItem : pedido.getPedidoItens()) {
 			html.append("<td>" + pedidoItem.getProduto().getNomeProduto() + "</td>");
 			html.append("<td>" + pedidoItem.getQtdPedidoitem() + "</td>");
-			html.append("<td>" + pedidoItem.getProduto().getVlProduto() * pedidoItem.getQtdPedidoitem() + "</td>");
+			html.append("<td> R$" + pedidoItem.getProduto().getVlProduto() * pedidoItem.getQtdPedidoitem() + "</td>");
+			html.append("<td> R$" + pedidoItem.getVltotalItem() + "</td>");
 		html.append("</tr>");
 			
 		}

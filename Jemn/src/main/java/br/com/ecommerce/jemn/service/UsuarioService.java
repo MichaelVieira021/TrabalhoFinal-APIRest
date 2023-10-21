@@ -12,11 +12,11 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-
 import br.com.ecommerce.jemn.dto.usuario.UsuarioLoginResponseDTO;
 import br.com.ecommerce.jemn.dto.usuario.UsuarioRequestDTO;
 import br.com.ecommerce.jemn.dto.usuario.UsuarioResponseDTO;
 import br.com.ecommerce.jemn.model.Usuario;
+import br.com.ecommerce.jemn.model.exceptions.ResourceConflict;
 import br.com.ecommerce.jemn.repository.UsuarioRepository;
 import br.com.ecommerce.jemn.security.JWTService;
 
@@ -104,4 +104,16 @@ public class UsuarioService {
         
         return new UsuarioLoginResponseDTO(token, usuarioResponse);
     }
+    
+	public void uniqueEMAILeTEL(UsuarioRequestDTO usuarioRequest, Long id){
+		List<UsuarioResponseDTO> listaUsuarioResponse = obterTodos();
+
+		for (UsuarioResponseDTO usuarioResponse : listaUsuarioResponse){
+			if(usuarioResponse.getEmail().equals(usuarioRequest.getEmail()) && usuarioResponse.getId() != id){
+				throw new ResourceConflict("E-mail já cadastrado!");
+			}else if (usuarioResponse.getTelefone().equals(usuarioResponse.getTelefone()) && usuarioResponse.getId() != id) {
+				throw new ResourceConflict("Telefone já cadastrado!");
+			}
+		}
+	}
 }

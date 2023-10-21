@@ -32,10 +32,10 @@ public class UsuarioController {
 	private UsuarioService usuarioService;
 	
 	@Operation(summary = "Pesquisa e traz todos os usuarios cadastrados ", method = "GET", description = "Metodo criado somente para o ADMIN ")
-		@ApiResponse(responseCode = "200", description = "Busca por ID realizada com sucesso")
-		@ApiResponse(responseCode = "422", description = "Dados de requisição inválidos")
-		@ApiResponse(responseCode = "400", description = "Paramentros inválidos")
-		@ApiResponse(responseCode = "500", description = "Erro ao realizar busca dos Dados por ID")
+	@ApiResponse(responseCode = "200", description = "Busca por ID realizada com sucesso")
+	@ApiResponse(responseCode = "422", description = "Dados de requisição inválidos")
+	@ApiResponse(responseCode = "400", description = "Paramentros inválidos")
+	@ApiResponse(responseCode = "500", description = "Erro ao realizar busca dos Dados por ID")
 	@GetMapping//ADMIN
 	@PreAuthorize("hasAuthority('ADMIN')")
 	public ResponseEntity<List<UsuarioResponseDTO>> obterTodos(){
@@ -43,10 +43,10 @@ public class UsuarioController {
 	}
 
 	@Operation(summary = "Pesquisa e traz por id um usuario cadastrado ", method = "GET", description = "Metodo criado somente para o ADMIN ")
-		@ApiResponse(responseCode = "200", description = "Busca por ID realizada com sucesso")
-		@ApiResponse(responseCode = "422", description = "Dados de requisição inválidos")
-		@ApiResponse(responseCode = "400", description = "Paramentros inválidos")
-		@ApiResponse(responseCode = "500", description = "Erro ao realizar busca dos Dados por ID")
+	@ApiResponse(responseCode = "200", description = "Busca por ID realizada com sucesso")
+	@ApiResponse(responseCode = "422", description = "Dados de requisição inválidos")
+	@ApiResponse(responseCode = "400", description = "Paramentros inválidos")
+	@ApiResponse(responseCode = "500", description = "Erro ao realizar busca dos Dados por ID")
 	@GetMapping("/{id}")
 	@PreAuthorize("hasAuthority('ADMIN')")
 	public ResponseEntity<UsuarioResponseDTO> obterPorId(@PathVariable Long id){
@@ -54,45 +54,48 @@ public class UsuarioController {
 	}
 
 	@Operation(summary = "Adiciona novo usuario ", method = "POST", description = "Metodo criado para todos ")
-		@ApiResponse(responseCode = "200", description = "Busca por ID realizada com sucesso")
-		@ApiResponse(responseCode = "422", description = "Dados de requisição inválidos")
-		@ApiResponse(responseCode = "400", description = "Paramentros inválidos")
-		@ApiResponse(responseCode = "500", description = "Erro ao realizar busca dos Dados por ID")
+	@ApiResponse(responseCode = "200", description = "Busca por ID realizada com sucesso")
+	@ApiResponse(responseCode = "422", description = "Dados de requisição inválidos")
+	@ApiResponse(responseCode = "400", description = "Paramentros inválidos")
+	@ApiResponse(responseCode = "500", description = "Erro ao realizar busca dos Dados por ID")
 	@PostMapping
 	public ResponseEntity<UsuarioResponseDTO> adicionar(@RequestBody UsuarioRequestDTO usuarioRequest){
+		usuarioService.uniqueEMAILeTEL(usuarioRequest, 0L);
 		return ResponseEntity.status(201).body(usuarioService.adicionar(usuarioRequest));
 	}
+	
 	@Operation(summary = "Atualiza um usuario cadastrado ", method = "PUT", description = "Metodo criado somente para o ADMIN ")
-		@ApiResponse(responseCode = "200", description = "Busca por ID realizada com sucesso")
-		@ApiResponse(responseCode = "422", description = "Dados de requisição inválidos")
-		@ApiResponse(responseCode = "400", description = "Paramentros inválidos")
-		@ApiResponse(responseCode = "500", description = "Erro ao realizar busca dos Dados por ID")
+	@ApiResponse(responseCode = "200", description = "Busca por ID realizada com sucesso")
+	@ApiResponse(responseCode = "422", description = "Dados de requisição inválidos")
+	@ApiResponse(responseCode = "400", description = "Paramentros inválidos")
+	@ApiResponse(responseCode = "500", description = "Erro ao realizar busca dos Dados por ID")
 	@PutMapping("/{id}")
 	@PreAuthorize("hasAuthority('ADMIN')")
 	public ResponseEntity<UsuarioResponseDTO> atualizar(@PathVariable Long id, @RequestBody UsuarioRequestDTO usuarioRequest){
+		usuarioService.uniqueEMAILeTEL(usuarioRequest, id);
 		return ResponseEntity.status(200).body(usuarioService.atualizar(id, usuarioRequest));
 	}
 	
 	@Operation(summary = "Deleta um usuario cadastrado ", method = "DELETE", description = "Metodo criado somente para o ADMIN ")
-		@ApiResponse(responseCode = "200", description = "Busca por ID realizada com sucesso")
-		@ApiResponse(responseCode = "422", description = "Dados de requisição inválidos")
-		@ApiResponse(responseCode = "400", description = "Paramentros inválidos")
-		@ApiResponse(responseCode = "500", description = "Erro ao realizar busca dos Dados por ID")
+	@ApiResponse(responseCode = "200", description = "Busca por ID realizada com sucesso")
+	@ApiResponse(responseCode = "422", description = "Dados de requisição inválidos")
+	@ApiResponse(responseCode = "400", description = "Paramentros inválidos")
+	@ApiResponse(responseCode = "500", description = "Erro ao realizar busca dos Dados por ID")
 	@DeleteMapping("/{id}")
 	@PreAuthorize("hasAuthority('ADMIN')")
 	public ResponseEntity<?> deletar(@PathVariable Long id){
 		usuarioService.deletar(id);
 		return ResponseEntity.status(204).build();
 	}
+	
 	@Operation(summary = "Loga um usuario existente ", method = "POST", description = "Metodo criado para todos (serve para conectar e obter o token de autorização para alguns metodos.) ")
-		@ApiResponse(responseCode = "200", description = "Busca por ID realizada com sucesso")
-		@ApiResponse(responseCode = "422", description = "Dados de requisição inválidos")
-		@ApiResponse(responseCode = "400", description = "Paramentros inválidos")
-		@ApiResponse(responseCode = "500", description = "Erro ao realizar busca dos Dados por ID")
+	@ApiResponse(responseCode = "200", description = "Busca por ID realizada com sucesso")
+	@ApiResponse(responseCode = "422", description = "Dados de requisição inválidos")
+	@ApiResponse(responseCode = "400", description = "Paramentros inválidos")
+	@ApiResponse(responseCode = "500", description = "Erro ao realizar busca dos Dados por ID")
 	@PostMapping("/login")
     public ResponseEntity<UsuarioLoginResponseDTO> logar(@RequestBody UsuarioLoginRequestDTO usuariologinRequest){
         UsuarioLoginResponseDTO usuarioLogado = usuarioService.logar(usuariologinRequest.getEmail(), usuariologinRequest.getSenha());
-        
         return ResponseEntity.status(200).body(usuarioLogado);
     }
 }

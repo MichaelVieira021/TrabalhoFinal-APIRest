@@ -31,7 +31,7 @@ public class CategoriaService {
 	@Autowired
 	private LogService logService;
 	
-	public List<CategoriaResponseDTO> obterTodos(){	
+	public List<CategoriaResponseDTO> obterTodos(){
 		
 		List<Categoria> categorias = categoriaRepository.findAll(Sort.by(Sort.Order.asc("id")));
 
@@ -51,10 +51,10 @@ public class CategoriaService {
 		
 		return mapper.map(optCategoria.get(), CategoriaResponseDTO.class);
 	}
-	
+
 	
 	//APENAS ADMIN---------------------------------------------------------
-	public List<CategoriaResponseDTO> obterTodosADMIN(){	
+	public List<CategoriaResponseDTO> obterTodosADMIN(){
 		
 		List<Categoria> categorias = categoriaRepository.findAll(Sort.by(Sort.Order.asc("id")));
 
@@ -100,7 +100,7 @@ public class CategoriaService {
 	
 	@Transactional
 	public CategoriaResponseDTO atualizar(Long id, CategoriaRequestDTO categoriaRequest){
-		var categoriaRegistro = obterPorId(id);
+		var categoriaRegistro = obterPorIdADMIN(id);
 		Categoria categoriaModel = mapper.map(categoriaRequest, Categoria.class);
 		categoriaModel.setId(id);
 		categoriaModel.setAtivo(categoriaRegistro.isAtivo());
@@ -142,7 +142,7 @@ public class CategoriaService {
 	
 	@Transactional
 	public void deletar(Long id){
-		var registroDelete = obterPorId(id);
+		var registroDelete = obterPorIdADMIN(id);
 		categoriaRepository.deleteById(id);
 
 		try{
@@ -162,14 +162,13 @@ public class CategoriaService {
 		}
 	}
 
-	public void unique(CategoriaRequestDTO categoriaRequestDTO){
+	public void unique(CategoriaRequestDTO categoriaRequest, Long id){
 		List<CategoriaResponseDTO> listaCategoriaResponse = obterTodosADMIN();
-
-		for (CategoriaResponseDTO categoriaResponseDTO : listaCategoriaResponse) {
-			if(categoriaResponseDTO.getNomeCategoria().equals(categoriaRequestDTO.getNomeCategoria())){
+		
+		for (CategoriaResponseDTO categoriaResponse : listaCategoriaResponse) {
+			if(categoriaResponse.getNomeCategoria().equals(categoriaRequest.getNomeCategoria()) && categoriaResponse.getId() != id){
 				throw new ResourceConflict("O nome da categoria já existe");
 			} 
 		}
-
 	}
 }

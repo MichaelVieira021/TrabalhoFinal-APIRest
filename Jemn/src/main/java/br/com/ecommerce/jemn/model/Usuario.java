@@ -20,7 +20,6 @@ import org.springframework.security.core.userdetails.UserDetails;
 @Entity
 public class Usuario implements UserDetails{
     
-    //#region propriedades
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "idUsuario")
@@ -49,8 +48,6 @@ public class Usuario implements UserDetails{
 
     @Column
     private ETipoPerfil perfil;
-    //#endregion propriedades
-
     
     public Usuario(Date dtCadastro) {
         this.dtCadastro = new Date();
@@ -113,8 +110,6 @@ public class Usuario implements UserDetails{
     public void setPerfil(ETipoPerfil perfil) {
         this.perfil = perfil;
     }
-    
-    //#endregion
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

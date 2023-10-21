@@ -1,7 +1,6 @@
 package br.com.ecommerce.jemn.model;
 
 import java.util.List;
-
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -10,7 +9,6 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
-
 import com.fasterxml.jackson.annotation.JsonBackReference;
 
 @Entity
@@ -21,10 +19,10 @@ public class Produto {
     @Column(name = "idProduto")
     private Long id;
 
-    @Column(nullable = false, length = 20)
+    @Column(nullable = false, length = 25)
     private String nomeProduto;
 
-    @Column(nullable = true, length = 150)
+    @Column(nullable = true)
     private String obsProduto;
 
     @Column(nullable = false)
@@ -32,7 +30,6 @@ public class Produto {
 
     @Column(nullable = false)
     private Integer qtdProduto;
-
    
     @ManyToOne
     @JoinColumn(name = "idCategoria", nullable = false)
@@ -47,7 +44,6 @@ public class Produto {
 
     @Column(nullable = false)
     private boolean ativo;
-
 
     public Long getId() {
         return id;
@@ -111,9 +107,6 @@ public class Produto {
 
     public void setAtivo(boolean ativo) {
         this.ativo = ativo;
-    }
-    
-    
-    
+    }  
 }
 

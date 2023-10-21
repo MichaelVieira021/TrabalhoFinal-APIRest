@@ -15,6 +15,8 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 import com.fasterxml.jackson.databind.ObjectMapper;
+
+import br.com.ecommerce.jemn.dto.categoria.CategoriaRequestDTO;
 import br.com.ecommerce.jemn.dto.categoria.CategoriaResponseDTO;
 import br.com.ecommerce.jemn.dto.pedidoItem.PedidoItemResponseDTO;
 import br.com.ecommerce.jemn.dto.produto.ProdutoRequestDTO;
@@ -23,6 +25,8 @@ import br.com.ecommerce.jemn.model.ETipoEntidade;
 import br.com.ecommerce.jemn.model.Log;
 import br.com.ecommerce.jemn.model.Produto;
 import br.com.ecommerce.jemn.model.Usuario;
+import br.com.ecommerce.jemn.model.exceptions.ResourceBadRequestException;
+import br.com.ecommerce.jemn.model.exceptions.ResourceConflict;
 import br.com.ecommerce.jemn.repository.ProdutoRepository;
 
 @Service
@@ -115,6 +119,10 @@ public class ProdutoService {
 
 	@Transactional
 	public ProdutoResponseDTO adicionar(ProdutoRequestDTO produtoRequest){
+		if(produtoRequest.getQtdProduto() < 0){
+			throw new ResourceBadRequestException("Não é possível cadastrar produtos com quantidade negativa!");
+		}
+		
 		CategoriaResponseDTO categoriaResponse = categoriaService.obterPorIdADMIN(produtoRequest.getCategoria().getId());		
 		produtoRequest.setCategoria(categoriaResponse);
 		Produto produtoModel = mapper.map(produtoRequest, Produto.class);
@@ -142,6 +150,10 @@ public class ProdutoService {
 
 	@Transactional
 	public ProdutoResponseDTO atualizar(Long id, ProdutoRequestDTO produtoRequest){
+		if(produtoRequest.getQtdProduto() < 0){
+			throw new ResourceBadRequestException("Não é possível cadastrar produtos com quantidade negativa!");
+		}
+		
 		var produtoRegistro = obterPorId(id);
 		Produto produtoModel = mapper.map(produtoRequest, Produto.class);
 		produtoModel.setId(id);
@@ -169,11 +181,9 @@ public class ProdutoService {
 
 	@Transactional
     public ProdutoResponseDTO atualizarQtd(ProdutoResponseDTO produtoRequest, PedidoItemResponseDTO pedidoItemResponse){
-        var produtoRegistro = obterPorId(produtoRequest.getId());
+        var produtoRegistro = obterPorId(pedidoItemResponse.getProduto().getId());
         Produto produtoModel = mapper.map(produtoRequest, Produto.class);
-        produtoModel.setId(produtoRequest.getId());
         produtoModel.setQtdProduto(produtoModel.getQtdProduto() - pedidoItemResponse.getQtdPedidoitem());
-        produtoModel.setAtivo(produtoRegistro.isAtivo());
         produtoModel = produtoRepository.save(produtoModel);
 
         try {
@@ -195,9 +205,15 @@ public class ProdutoService {
         return mapper.map(produtoModel, ProdutoResponseDTO.class);
     }
 	
+	public void catEmUso(Long id) {
+		if(!obterPorCategoriaADMIN(id).isEmpty()) {
+			throw new  ResourceBadRequestException("A categoria não pode ser removida, pois ela está sendo utilizada em outra operação");
+		}
+	}
+	
 	@Transactional
 	public void deletar(Long id) {
-		var registroDelete = obterPorId(id);
+		var registroDelete = obterPorIdADMIN(id);
 		produtoRepository.deleteById(id);
 
 		try {
@@ -233,9 +249,19 @@ public class ProdutoService {
 	}
 
 	public void enviarImagem(@RequestParam("imagem") MultipartFile file,@PathVariable Long id) throws IOException{
-		String base64File = Base64.getEncoder().encodeToString(file.getBytes()); 
 		Produto produtoModel = mapper.map(obterPorIdADMIN(id), Produto.class);
+		String base64File = Base64.getEncoder().encodeToString(file.getBytes());
 		produtoModel.setFlieBase64(base64File);
-		produtoRepository.save(produtoModel);	
+		produtoRepository.save(produtoModel);
+	}
+	
+	public void unique(ProdutoRequestDTO produtoRequest, Long id){
+		List<ProdutoResponseDTO> listaProdutoResponse = obterTodosADMIN();
+
+		for (ProdutoResponseDTO produtoResponse : listaProdutoResponse){
+			if(produtoResponse.getNomeProduto().equals(produtoRequest.getNomeProduto()) && produtoResponse.getId() != id){
+				throw new ResourceConflict("O nome do produto já existe");
+			}
+		}
 	}
 }

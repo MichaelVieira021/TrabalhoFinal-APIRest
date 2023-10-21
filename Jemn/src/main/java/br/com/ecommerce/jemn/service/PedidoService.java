@@ -103,6 +103,7 @@ public class PedidoService {
         	pedidoItemResponse.setProduto(prResponse);
 
 			controleEstoque(pedidoItemResponse);
+			
 			double vlTotalBruto = pedidoItemResponse.getProduto().getVlProduto() * pedidoItemResponse.getQtdPedidoitem();
 			//PROMOÇÃO ATACADISTA
 			if (pedidoItemResponse.getQtdPedidoitem() >= 5){
@@ -121,9 +122,11 @@ public class PedidoService {
     }
 	
     private void controleEstoque(PedidoItemResponseDTO pedidoItemResponse){
-		if (pedidoItemResponse.getQtdPedidoitem() > pedidoItemResponse.getProduto().getQtdProduto()){
-			 throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Quantidade solicitada é maior que a quantidade em estoque");            
-		} else{
+		if (pedidoItemResponse.getQtdPedidoitem() < 1){
+			 throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Insira uma quantidade válida. A quantidade deve ser igual ou maior que 1");
+		}else if(pedidoItemResponse.getQtdPedidoitem() > pedidoItemResponse.getProduto().getQtdProduto() ) {
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Quantidade solicitada é maior que a quantidade em estoque");
+		}else{
 			produtoService.atualizarQtd(pedidoItemResponse.getProduto(), pedidoItemResponse);
 		}
 	}

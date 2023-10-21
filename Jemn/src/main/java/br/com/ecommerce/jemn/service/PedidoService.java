@@ -154,20 +154,21 @@ public class PedidoService {
 		html.append("<img src=\"https://i.postimg.cc/3wWD0Q6B/20003871-7ede-4cbc-abef-02ef1e7c0e57-removebg-preview.png\" alt=\"imagem-2023-10-18-235948700\" margin=0; height=25%; width=25%;>");
 		html.append("<h1 style=\"color:#292325; text-align: center; font-family:Trebuchet MS; font-size:300%; \">" + "Olá" + " " + pedido.getUsuario().getNomeUsuario() + "!" + "</h1>"
 		+ "<h1 style=\"color:#292325; text-align: center; font-family:Trebuchet MS; font-size:300%; \">" + "Seu pedido de Nº" + pedido.getId() + " " + "pago via " +  pedido.getFormaPg() + " " + "foi finalizado com sucesso!"  + "</h1>"
-		+ "<table style=\"border-collapse: collapse; width: 100%; margin: 0 20px 0 20px;\">"
+		+ "<table style=\"border-collapse: collapse; width: 100%; margin-right: -20px; margin-left: -20px;\">"
 		+ "<tr>"
-		+ "<th style=\"padding: 8px; border: 2px solid black; background-color: #2E272A; color:white; text-align: center; font-family:Trebuchet MS; font-size:150%;\">PRODUTOS COMPRADOS</th>"
-		+ "<th style=\"padding: 8px; border: 2px solid black; background-color: #2E272A; color:white; text-align: center; font-family:Trebuchet MS; font-size:150%;\">QUANTIDADE</th>"
-		+ "<th style=\"padding: 8px; border: 2px solid black; background-color: #2E272A; color:white; text-align: center; font-family:Trebuchet MS; font-size:150%;\">VALOR TOTAL DOS PRODUTOS</th>"
-		+ "<th style=\"padding: 8px; border: 2px solid black; background-color: #2E272A; color:white; text-align: center; font-family:Trebuchet MS; font-size:150%;\">VALOR TOTAL COM DESCONTO</th>"
-		+ "</tr>"
-		+ "<br>");
+		+ "<th style=\"padding: 8px; border: 2px solid black; background-color: #B3A085; color:white; text-align: center; font-family:Trebuchet MS; font-size:150%;\">PRODUTOS COMPRADOS</th>"
+		+ "<th style=\"padding: 8px; border: 2px solid black; background-color: #B3A085; color:white; text-align: center; font-family:Trebuchet MS; font-size:150%;\">QUANTIDADE</th>"
+		+ "<th style=\"padding: 8px; border: 2px solid black; background-color: #B3A085; color:white; text-align: center; font-family:Trebuchet MS; font-size:150%;\">VALOR TOTAL DOS PRODUTOS</th>"
+		+ "<th style=\"padding: 8px; border: 2px solid black; background-color: #B3A085; color:white; text-align: center; font-family:Trebuchet MS; font-size:150%;\">VALOR TOTAL COM DESCONTO</th>"
+		+ "</tr>");
+		
 
 		for (PedidoItem pedidoItem : pedido.getPedidoItens()) {
-		html.append("<td style=\"padding: 8px; border: 2px solid black; background-color: #B3A085; text-align: center; font-family:Trebuchet MS; font-size:150%;\">" + pedidoItem.getProduto().getNomeProduto() + "</td>"
-		+ "<td style=\"padding: 8px; border: 2px solid black; background-color: #B3A085; text-align: center; font-family:Trebuchet MS; font-size:150%;\" >" + pedidoItem.getQtdPedidoitem() + "</td>"
-		+ "<td style=\"padding: 8px; border: 2px solid black; background-color: #B3A085; text-align: center; font-family:Trebuchet MS; font-size:150%;\"> R$" + pedidoItem.getProduto().getVlProduto() * pedidoItem.getQtdPedidoitem() + "</td>"
-		+ "<td style=\"padding: 8px; border: 2px solid black; background-color: #B3A085; text-align: center; font-family:Trebuchet MS; font-size:150%;\"> R$" + pedidoItem.getVltotalItem() + "</td>"
+		html.append("<tr>"
+		+ "<td style=\"padding: 8px; border: 2px solid black; background-color: #D8CEC5; text-align: center; font-family:Trebuchet MS; font-size:150%;\">" + pedidoItem.getProduto().getNomeProduto() + "</td>"
+		+ "<td style=\"padding: 8px; border: 2px solid black; background-color: #D8CEC5; text-align: center; font-family:Trebuchet MS; font-size:150%;\" >" + pedidoItem.getQtdPedidoitem() + "</td>"
+		+ "<td style=\"padding: 8px; border: 2px solid black; background-color: #D8CEC5; text-align: center; font-family:Trebuchet MS; font-size:150%;\"> R$" + pedidoItem.getProduto().getVlProduto() * pedidoItem.getQtdPedidoitem() + "</td>"
+		+ "<td style=\"padding: 8px; border: 2px solid black; background-color: #D8CEC5; text-align: center; font-family:Trebuchet MS; font-size:150%;\"> R$" + pedidoItem.getVltotalItem() + "</td>"
 		+ "</tr>");
 		}
 

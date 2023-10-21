@@ -139,10 +139,10 @@ public class PedidoService {
 
 	public ResponseEntity<?> envioDeEmail(Pedido pedido) {
 		String destinatario = pedido.getUsuario().getEmail();
-		String mensagem = gerarHTMLComDadosDosPedidos(pedido);
+		String mensagem = gerarHTMLComDadosDosPedidos(pedido);	
+		
 		Email email = new Email("RESUMO PEDIDO JEMN", mensagem, "elton.medeiros14@gmail.com", destinatario);
 		emailService.enviar(email);
-
         return ResponseEntity.status(200).body("E-mail enviado com sucesso!!!");
     }
 
@@ -150,62 +150,31 @@ public class PedidoService {
 	StringBuilder html = new StringBuilder();
 
 		// Tabela com os dados dos pedidos
-
-		html.append("<style>");
-		html.append("table {");
-		html.append("border-collapse: collapse;");
-		html.append("width: 100%; margin: 0 20px 0 20px");
-		html.append("}");
-
-		html.append("th, td {");
-		html.append("padding: 8px;");
-		html.append("border: 1px solid black;");
-		html.append("}");
-
-		html.append("th {");
-		html.append("background-color: #ffcbdb;");
-		html.append("text-align: center;");
-		html.append("}");
-
-		html.append("td {");
-		html.append("background-color: #ffe4e1;");
-		html.append("text-align: center;");
-		html.append("}");
-		html.append("</style>");
-
 		html.append("<div style=\"text-align: center;\">");
-			
-		html.append("<img src=\"https://i.postimg.cc/9M34LBwG/logook.png\" alt=\"imagem-2023-10-18-235948700\" border=\"0\" height:170px; width:250px;\">");
-		html.append("<h1 style=\"color:#292325\">Olá!</h1>");
-		html.append("<table style=\"border-collapse: collapse;\">");
-		html.append("<tr>");
-		html.append("<th>PRODUTOS COMPRADOS</th>");
-		html.append("<th>QUANTIDADE</th>");
-		html.append("<th>VALOR TOTAL DOS PRODUTOS</th>");
-		html.append("<th>VALOR TOTAL COM DESCONTO</th>");
-		html.append("</tr>");
+		html.append("<img src=\"https://i.postimg.cc/3wWD0Q6B/20003871-7ede-4cbc-abef-02ef1e7c0e57-removebg-preview.png\" alt=\"imagem-2023-10-18-235948700\" margin=0; height=25%; width=25%;>");
+		html.append("<h1 style=\"color:#292325; text-align: center; font-family:Trebuchet MS; font-size:300%; \">" + "Olá" + " " + pedido.getUsuario().getNomeUsuario() + "!" + "</h1>"
+		+ "<h1 style=\"color:#292325; text-align: center; font-family:Trebuchet MS; font-size:300%; \">" + "Seu pedido de Nº" + pedido.getId() + " " + "pago via " +  pedido.getFormaPg() + " " + "foi finalizado com sucesso!"  + "</h1>"
+		+ "<table style=\"border-collapse: collapse; width: 100%; margin: 0 20px 0 20px;\">"
+		+ "<tr>"
+		+ "<th style=\"padding: 8px; border: 2px solid black; background-color: #2E272A; color:white; text-align: center; font-family:Trebuchet MS; font-size:150%;\">PRODUTOS COMPRADOS</th>"
+		+ "<th style=\"padding: 8px; border: 2px solid black; background-color: #2E272A; color:white; text-align: center; font-family:Trebuchet MS; font-size:150%;\">QUANTIDADE</th>"
+		+ "<th style=\"padding: 8px; border: 2px solid black; background-color: #2E272A; color:white; text-align: center; font-family:Trebuchet MS; font-size:150%;\">VALOR TOTAL DOS PRODUTOS</th>"
+		+ "<th style=\"padding: 8px; border: 2px solid black; background-color: #2E272A; color:white; text-align: center; font-family:Trebuchet MS; font-size:150%;\">VALOR TOTAL COM DESCONTO</th>"
+		+ "</tr>"
+		+ "<br>");
 
-	
-		html.append("<h1 style=\"color:#292325\">" +  pedido.getUsuario().getNomeUsuario() +  "," +"  " + "seu pedido de Nº " + pedido.getId() + " " + "pago via " +  pedido.getFormaPg() + " " + "foi finalizado com sucesso!"  + "</h1>");
-		html.append("<br>");
-		
 		for (PedidoItem pedidoItem : pedido.getPedidoItens()) {
-			html.append("<td>" + pedidoItem.getProduto().getNomeProduto() + "</td>");
-			html.append("<td>" + pedidoItem.getQtdPedidoitem() + "</td>");
-			html.append("<td> R$" + pedidoItem.getProduto().getVlProduto() * pedidoItem.getQtdPedidoitem() + "</td>");
-			html.append("<td> R$" + pedidoItem.getVltotalItem() + "</td>");
-		html.append("</tr>");
-			
+		html.append("<td style=\"padding: 8px; border: 2px solid black; background-color: #B3A085; text-align: center; font-family:Trebuchet MS; font-size:150%;\">" + pedidoItem.getProduto().getNomeProduto() + "</td>"
+		+ "<td style=\"padding: 8px; border: 2px solid black; background-color: #B3A085; text-align: center; font-family:Trebuchet MS; font-size:150%;\" >" + pedidoItem.getQtdPedidoitem() + "</td>"
+		+ "<td style=\"padding: 8px; border: 2px solid black; background-color: #B3A085; text-align: center; font-family:Trebuchet MS; font-size:150%;\"> R$" + pedidoItem.getProduto().getVlProduto() * pedidoItem.getQtdPedidoitem() + "</td>"
+		+ "<td style=\"padding: 8px; border: 2px solid black; background-color: #B3A085; text-align: center; font-family:Trebuchet MS; font-size:150%;\"> R$" + pedidoItem.getVltotalItem() + "</td>"
+		+ "</tr>");
 		}
-		html.append("</table>");
 
-		html.append("<h1 style=\"color:green\">Valor total do pedido: R$" + pedido.getVltotalPedido() + "</h1>");
-		
-		// Rodape do HTML
-		html.append("<p><h3 style=\"color:#292325\">Obrigado por sua compra! 🥰</h3></p>");
+		html.append("</table>"
+		+ "<h1 style=\"color:black; text-align: center;  font-family:Impact; font-size:250%;\">Valor total do pedido: R$" + pedido.getVltotalPedido() + "</h1>"			
+		+ "<p><h3 style=\"color:#292325; text-align: center; font-family:Trebuchet MS; font-size:200%;\">Obrigado por sua compra!</h3></p>");
 
-        return html.toString();
+		return html.toString();
     }
-    
-
 }

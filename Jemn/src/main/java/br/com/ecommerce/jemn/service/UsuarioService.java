@@ -72,6 +72,8 @@ public class UsuarioService {
 		obterPorId(id);
 		Usuario usuarioModel = mapper.map(usuarioRequest, Usuario.class);
 		usuarioModel.setId(id);
+		String senha =  passwordEncoder.encode(usuarioModel.getSenha());
+		usuarioModel.setSenha(senha);
 		usuarioModel = usuarioRepository.save(usuarioModel);
 		
 		return mapper.map(usuarioModel, UsuarioResponseDTO.class);

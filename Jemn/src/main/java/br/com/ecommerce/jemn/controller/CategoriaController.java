@@ -1,6 +1,7 @@
 package br.com.ecommerce.jemn.controller;
 
 import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -12,8 +13,11 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
 import br.com.ecommerce.jemn.dto.categoria.CategoriaRequestDTO;
 import br.com.ecommerce.jemn.dto.categoria.CategoriaResponseDTO;
+import br.com.ecommerce.jemn.model.exceptions.ResourceBadRequestException;
+import br.com.ecommerce.jemn.model.exceptions.ResourceUnprocessableEntity;
 import br.com.ecommerce.jemn.service.CategoriaService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -77,6 +81,10 @@ public class CategoriaController {
 	@PostMapping
 	@PreAuthorize("hasAuthority('ADMIN')")
 	public ResponseEntity<CategoriaResponseDTO> adicionar(@RequestBody CategoriaRequestDTO categoriaRequest){
+		if(categoriaRequest.getNomeCategoria().length() > 25){
+			throw new  ResourceUnprocessableEntity("O número de letras excedi o permitido");
+		} 
+		categoriaService.unique(categoriaRequest);
 		return ResponseEntity.status(201).body(categoriaService.adicionar(categoriaRequest));
 	}
 	@Operation(summary = "Altera uma Categoria Cadastrada ", method = "PUT", description = "Metodo com permissão somente para usuario 'ADMIN'")
@@ -87,6 +95,9 @@ public class CategoriaController {
 	@PutMapping("/{id}")
 	@PreAuthorize("hasAuthority('ADMIN')")
 	public ResponseEntity<CategoriaResponseDTO> atualizar(@PathVariable Long id, @RequestBody CategoriaRequestDTO categoriaRequest){
+		if(categoriaRequest.getNomeCategoria().length() > 25){
+			throw new  ResourceUnprocessableEntity("O número de letras excedi o permitido");
+		}
 		return ResponseEntity.status(200).body(categoriaService.atualizar(id, categoriaRequest));
 	}
 	@Operation(summary = "Ativa uma Categoria Cadastrada ", method = "PUT", description = "Metodo com permissão somente para usuario 'ADMIN'")
@@ -117,7 +128,11 @@ public class CategoriaController {
 	@DeleteMapping("/{id}")
 	@PreAuthorize("hasAuthority('ADMIN')")
 	public ResponseEntity<?> deletar(@PathVariable Long id){
-		categoriaService.deletar(id);
+		try {
+			categoriaService.deletar(id);
 		return ResponseEntity.status(204).build();
+		} catch (Exception e) {
+        throw new  ResourceBadRequestException("A categoria não pode ser removida, pois ela está sendo utilizada em outra operação");
+		}
 	}
 }

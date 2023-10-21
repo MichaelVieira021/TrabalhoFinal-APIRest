@@ -16,6 +16,7 @@ import br.com.ecommerce.jemn.model.Categoria;
 import br.com.ecommerce.jemn.model.ETipoEntidade;
 import br.com.ecommerce.jemn.model.Log;
 import br.com.ecommerce.jemn.model.Usuario;
+import br.com.ecommerce.jemn.model.exceptions.ResourceConflict;
 import br.com.ecommerce.jemn.repository.CategoriaRepository;
 
 @Service
@@ -159,5 +160,16 @@ public class CategoriaService {
 		}catch(Exception e){
 			throw new RuntimeException("Ocorreu um erro ao deletar a categoria: " + e.getMessage());
 		}
+	}
+
+	public void unique(CategoriaRequestDTO categoriaRequestDTO){
+		List<CategoriaResponseDTO> listaCategoriaResponse = obterTodosADMIN();
+
+		for (CategoriaResponseDTO categoriaResponseDTO : listaCategoriaResponse) {
+			if(categoriaResponseDTO.getNomeCategoria().equals(categoriaRequestDTO.getNomeCategoria())){
+				throw new ResourceConflict("O nome da categoria já existe");
+			} 
+		}
+
 	}
 }

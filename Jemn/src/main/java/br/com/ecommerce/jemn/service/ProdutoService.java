@@ -1,9 +1,6 @@
 package br.com.ecommerce.jemn.service;
 
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.List;
@@ -17,13 +14,11 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
-
 import com.fasterxml.jackson.databind.ObjectMapper;
-
 import br.com.ecommerce.jemn.dto.categoria.CategoriaResponseDTO;
+import br.com.ecommerce.jemn.dto.pedidoItem.PedidoItemResponseDTO;
 import br.com.ecommerce.jemn.dto.produto.ProdutoRequestDTO;
 import br.com.ecommerce.jemn.dto.produto.ProdutoResponseDTO;
-import br.com.ecommerce.jemn.model.Categoria;
 import br.com.ecommerce.jemn.model.ETipoEntidade;
 import br.com.ecommerce.jemn.model.Log;
 import br.com.ecommerce.jemn.model.Produto;
@@ -172,6 +167,34 @@ public class ProdutoService {
 		return mapper.map(produtoModel, ProdutoResponseDTO.class);
 	}
 
+	@Transactional
+    public ProdutoResponseDTO atualizarQtd(ProdutoResponseDTO produtoRequest, PedidoItemResponseDTO pedidoItemResponse){
+        var produtoRegistro = obterPorId(produtoRequest.getId());
+        Produto produtoModel = mapper.map(produtoRequest, Produto.class);
+        produtoModel.setId(produtoRequest.getId());
+        produtoModel.setQtdProduto(produtoModel.getQtdProduto() - pedidoItemResponse.getQtdPedidoitem());
+        produtoModel.setAtivo(produtoRegistro.isAtivo());
+        produtoModel = produtoRepository.save(produtoModel);
+
+        try {
+            Usuario usuario = (Usuario) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        
+            Log log = new Log(
+            ETipoEntidade.PRODUTO,
+            "ATUALIZACAO", 
+            new ObjectMapper().writeValueAsString(produtoRegistro),
+            new ObjectMapper().writeValueAsString(produtoModel),
+            usuario
+            );
+
+            logService.registrarLog(log);
+
+        } catch (Exception e) {
+            throw new RuntimeException("Ocorreu um erro ao atualizar o produto: " + e.getMessage());
+        }
+        return mapper.map(produtoModel, ProdutoResponseDTO.class);
+    }
+	
 	@Transactional
 	public void deletar(Long id) {
 		var registroDelete = obterPorId(id);

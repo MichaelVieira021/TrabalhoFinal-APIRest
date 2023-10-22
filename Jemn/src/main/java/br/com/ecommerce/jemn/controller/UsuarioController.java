@@ -17,6 +17,8 @@ import br.com.ecommerce.jemn.dto.usuario.UsuarioLoginRequestDTO;
 import br.com.ecommerce.jemn.dto.usuario.UsuarioLoginResponseDTO;
 import br.com.ecommerce.jemn.dto.usuario.UsuarioRequestDTO;
 import br.com.ecommerce.jemn.dto.usuario.UsuarioResponseDTO;
+import br.com.ecommerce.jemn.model.exceptions.ResourceBadRequestException;
+import br.com.ecommerce.jemn.model.exceptions.ResourceUnprocessableEntity;
 import br.com.ecommerce.jemn.service.UsuarioService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -62,7 +64,32 @@ public class UsuarioController {
 	@ApiResponse(responseCode = "500", description = "Erro ao realizar busca dos Dados por ID")
 	@PostMapping
 	public ResponseEntity<UsuarioResponseDTO> adicionar(@RequestBody UsuarioRequestDTO usuarioRequest){
-		usuarioService.uniqueEMAILeTEL(usuarioRequest, 0L);
+		if(usuarioRequest.getPerfil() == null){
+			throw new  ResourceUnprocessableEntity("Perfil não encontrado.");
+		}
+
+		if(usuarioRequest.getNomeUsuario() == null || usuarioRequest.getNomeUsuario().length() < 1){
+			throw new  ResourceBadRequestException("Nome do usuario não pode estar vazio.");
+		} else if(usuarioRequest.getNomeUsuario().length() > 15){
+			throw new  ResourceUnprocessableEntity("Limite de caracteres excedido, MAX:15");
+		}
+
+		if(usuarioRequest.getEmail() == null || usuarioRequest.getEmail().length() < 1){
+			throw new  ResourceBadRequestException("E-mail não pode estar vazio.");
+		}
+
+		if(usuarioRequest.getSenha() == null || usuarioRequest.getSenha().length() < 1){
+			throw new  ResourceBadRequestException("Senha não pode estar vazio.");
+		} else if(usuarioRequest.getSenha().length() > 15){
+			throw new  ResourceUnprocessableEntity("Limite de caracteres excedido, MAX:15");
+		}
+
+		if(usuarioRequest.getTelefone() == null || usuarioRequest.getTelefone().length() < 1){
+			throw new  ResourceBadRequestException("Tel. não pode estar vazio.");
+		} else if(usuarioRequest.getTelefone().length() > 14){
+			throw new  ResourceUnprocessableEntity("Limite de caracteres excedido, MAX:15");
+		}
+
 		return ResponseEntity.status(201).body(usuarioService.adicionar(usuarioRequest));
 	}
 	
@@ -74,7 +101,32 @@ public class UsuarioController {
 	@PutMapping("/{id}")
 	@PreAuthorize("hasAuthority('ADMIN')")
 	public ResponseEntity<UsuarioResponseDTO> atualizar(@PathVariable Long id, @RequestBody UsuarioRequestDTO usuarioRequest){
-		usuarioService.uniqueEMAILeTEL(usuarioRequest, id);
+		if(usuarioRequest.getPerfil() == null){
+			throw new  ResourceUnprocessableEntity("Perfil não encontrado.");
+		}
+
+		if(usuarioRequest.getNomeUsuario() == null || usuarioRequest.getNomeUsuario().length() < 1){
+			throw new  ResourceBadRequestException("Nome do usuario não pode estar vazio.");
+		} else if(usuarioRequest.getNomeUsuario().length() > 15){
+			throw new  ResourceUnprocessableEntity("Limite de caracteres excedido, MAX:15");
+		}
+
+		if(usuarioRequest.getEmail() == null || usuarioRequest.getEmail().length() < 1){
+			throw new  ResourceBadRequestException("E-mail não pode estar vazio.");
+		}
+
+		if(usuarioRequest.getSenha() == null || usuarioRequest.getSenha().length() < 1){
+			throw new  ResourceBadRequestException("Senha não pode estar vazio.");
+		} else if(usuarioRequest.getSenha().length() > 15){
+			throw new  ResourceUnprocessableEntity("Limite de caracteres excedido, MAX:15");
+		}
+
+		if(usuarioRequest.getTelefone() == null || usuarioRequest.getTelefone().length() < 1){
+			throw new  ResourceBadRequestException("Tel. não pode estar vazio.");
+		} else if(usuarioRequest.getTelefone().length() > 14){
+			throw new  ResourceUnprocessableEntity("Limite de caracteres excedido, MAX:15");
+		}
+
 		return ResponseEntity.status(200).body(usuarioService.atualizar(id, usuarioRequest));
 	}
 	

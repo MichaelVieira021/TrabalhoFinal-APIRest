@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 import br.com.ecommerce.jemn.dto.usuario.UsuarioLoginResponseDTO;
 import br.com.ecommerce.jemn.dto.usuario.UsuarioRequestDTO;
 import br.com.ecommerce.jemn.dto.usuario.UsuarioResponseDTO;
+import br.com.ecommerce.jemn.model.ETipoPerfil;
 import br.com.ecommerce.jemn.model.Usuario;
 import br.com.ecommerce.jemn.model.exceptions.ResourceConflict;
 import br.com.ecommerce.jemn.repository.UsuarioRepository;
@@ -60,6 +61,7 @@ public class UsuarioService {
 	}
 	
 	public UsuarioResponseDTO adicionar(UsuarioRequestDTO usuarioRequest){
+		uniqueEMAILeTEL(usuarioRequest, 0L);
 		Usuario usuarioModel = mapper.map(usuarioRequest, Usuario.class);
         String senha =  passwordEncoder.encode(usuarioModel.getSenha());
 		usuarioModel.setSenha(senha);
@@ -69,6 +71,7 @@ public class UsuarioService {
 	}
 	
 	public UsuarioResponseDTO atualizar(Long id, UsuarioRequestDTO usuarioRequest){
+		uniqueEMAILeTEL(usuarioRequest, id);
 		obterPorId(id);
 		Usuario usuarioModel = mapper.map(usuarioRequest, Usuario.class);
 		usuarioModel.setId(id);
@@ -111,9 +114,19 @@ public class UsuarioService {
 		for (UsuarioResponseDTO usuarioResponse : listaUsuarioResponse){
 			if(usuarioResponse.getEmail().equals(usuarioRequest.getEmail()) && usuarioResponse.getId() != id){
 				throw new ResourceConflict("E-mail já cadastrado!");
-			}else if (usuarioResponse.getTelefone().equals(usuarioResponse.getTelefone()) && usuarioResponse.getId() != id) {
+			}else if (usuarioResponse.getTelefone().equals(usuarioRequest.getTelefone()) && usuarioResponse.getId() != id) {
 				throw new ResourceConflict("Telefone já cadastrado!");
 			}
 		}
 	}
+
+	public boolean verificaPerfil(ETipoPerfil p){
+		for(ETipoPerfil tpP : ETipoPerfil.values()){
+			if(p.compareTo(tpP) == 0){
+				return true;
+			}
+		}
+		return false;
+	}
+
 }

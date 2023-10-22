@@ -15,8 +15,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 import com.fasterxml.jackson.databind.ObjectMapper;
-
-import br.com.ecommerce.jemn.dto.categoria.CategoriaRequestDTO;
 import br.com.ecommerce.jemn.dto.categoria.CategoriaResponseDTO;
 import br.com.ecommerce.jemn.dto.pedidoItem.PedidoItemResponseDTO;
 import br.com.ecommerce.jemn.dto.produto.ProdutoRequestDTO;
@@ -119,9 +117,7 @@ public class ProdutoService {
 
 	@Transactional
 	public ProdutoResponseDTO adicionar(ProdutoRequestDTO produtoRequest){
-		if(produtoRequest.getQtdProduto() < 0){
-			throw new ResourceBadRequestException("Não é possível cadastrar produtos com quantidade negativa!");
-		}
+		unique(produtoRequest, 0L);
 		
 		CategoriaResponseDTO categoriaResponse = categoriaService.obterPorIdADMIN(produtoRequest.getCategoria().getId());		
 		produtoRequest.setCategoria(categoriaResponse);
@@ -150,11 +146,12 @@ public class ProdutoService {
 
 	@Transactional
 	public ProdutoResponseDTO atualizar(Long id, ProdutoRequestDTO produtoRequest){
-		if(produtoRequest.getQtdProduto() < 0){
-			throw new ResourceBadRequestException("Não é possível cadastrar produtos com quantidade negativa!");
-		}
+		unique(produtoRequest, id);
 		
 		var produtoRegistro = obterPorId(id);
+		CategoriaResponseDTO categoriaResponse = categoriaService.obterPorIdADMIN(produtoRequest.getCategoria().getId());		
+		produtoRequest.setCategoria(categoriaResponse);
+		
 		Produto produtoModel = mapper.map(produtoRequest, Produto.class);
 		produtoModel.setId(id);
 		produtoModel.setAtivo(produtoRegistro.isAtivo());

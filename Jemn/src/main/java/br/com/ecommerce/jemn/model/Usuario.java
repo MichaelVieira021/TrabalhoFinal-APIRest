@@ -25,16 +25,16 @@ public class Usuario implements UserDetails{
     @Column(name = "idUsuario")
     private Long id;
 
-    @Column(nullable = false)
+    @Column(nullable = false, length = 15)
     private String nomeUsuario;
 
     @Column(nullable = false, unique = true)
     private String email;
 
-    @Column(nullable = false)
+    @Column(nullable = false, length = 15)
     private String senha;
 
-    @Column(nullable = false, unique = true)
+    @Column(nullable = false, unique = true, length = 14)
     private String telefone;
 
     @Column(nullable = false)
@@ -46,7 +46,7 @@ public class Usuario implements UserDetails{
     @OneToMany(mappedBy = "usuario")
     private List<Log> logs;
 
-    @Column
+    @Column(nullable = false)
     private ETipoPerfil perfil;
     
     public Usuario(Date dtCadastro) {

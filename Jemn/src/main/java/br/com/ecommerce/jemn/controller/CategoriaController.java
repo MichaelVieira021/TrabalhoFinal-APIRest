@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import br.com.ecommerce.jemn.dto.categoria.CategoriaRequestDTO;
 import br.com.ecommerce.jemn.dto.categoria.CategoriaResponseDTO;
+import br.com.ecommerce.jemn.model.exceptions.ResourceBadRequestException;
 import br.com.ecommerce.jemn.model.exceptions.ResourceUnprocessableEntity;
 import br.com.ecommerce.jemn.service.CategoriaService;
 import br.com.ecommerce.jemn.service.ProdutoService;
@@ -85,11 +86,11 @@ public class CategoriaController {
 	@PostMapping
 	@PreAuthorize("hasAuthority('ADMIN')")
 	public ResponseEntity<CategoriaResponseDTO> adicionar(@RequestBody CategoriaRequestDTO categoriaRequest){
-		categoriaService.unique(categoriaRequest, 0L);
-		if(categoriaRequest.getNomeCategoria().length() > 25){
-			throw new  ResourceUnprocessableEntity("Limite de caracteres excedido, MAX:25");
-		} 
-		
+		if(categoriaRequest.getNomeCategoria() == null || categoriaRequest.getNomeCategoria().length() < 1){
+			throw new  ResourceBadRequestException("Nome da categoria não pode estar vazio.");
+		} else if(categoriaRequest.getNomeCategoria().length() > 25){
+				throw new  ResourceUnprocessableEntity("Limite de caracteres excedido, MAX:25");
+		}
 		return ResponseEntity.status(201).body(categoriaService.adicionar(categoriaRequest));
 	}
 	
@@ -101,9 +102,10 @@ public class CategoriaController {
 	@PutMapping("/{id}")
 	@PreAuthorize("hasAuthority('ADMIN')")
 	public ResponseEntity<CategoriaResponseDTO> atualizar(@PathVariable Long id, @RequestBody CategoriaRequestDTO categoriaRequest){
-		categoriaService.unique(categoriaRequest, id);
-		if(categoriaRequest.getNomeCategoria().length() > 25){
-			throw new  ResourceUnprocessableEntity("Limite de caracteres excedido, MAX:25");
+		if(categoriaRequest.getNomeCategoria() == null || categoriaRequest.getNomeCategoria().length() < 1){
+			throw new  ResourceBadRequestException("Nome da categoria não pode estar vazio.");
+		} else if(categoriaRequest.getNomeCategoria().length() > 25){
+				throw new  ResourceUnprocessableEntity("Limite de caracteres excedido, MAX:25");
 		}
 		
 		return ResponseEntity.status(200).body(categoriaService.atualizar(id, categoriaRequest));
@@ -116,7 +118,7 @@ public class CategoriaController {
 	@ApiResponse(responseCode = "500", description = "Erro ao realizar busca dos Dados por ID")
 	@PutMapping("/ativar/{id}")
 	@PreAuthorize("hasAuthority('ADMIN')")
-	public ResponseEntity<CategoriaResponseDTO> ativar(@PathVariable Long id, @RequestBody CategoriaRequestDTO categoriaRequest){
+	public ResponseEntity<CategoriaResponseDTO> ativar(@PathVariable Long id){
 		return ResponseEntity.status(200).body(categoriaService.ativar(id));
 	}
 	
@@ -127,7 +129,7 @@ public class CategoriaController {
 	@ApiResponse(responseCode = "500", description = "Erro ao realizar busca dos Dados por ID")
 	@PutMapping("/desativar/{id}")
 	@PreAuthorize("hasAuthority('ADMIN')")
-	public ResponseEntity<CategoriaResponseDTO> desativar(@PathVariable Long id, @RequestBody CategoriaRequestDTO categoriaRequest){
+	public ResponseEntity<CategoriaResponseDTO> desativar(@PathVariable Long id){
 		return ResponseEntity.status(200).body(categoriaService.desativar(id));
 	}
 	

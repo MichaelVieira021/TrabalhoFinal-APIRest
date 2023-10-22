@@ -76,6 +76,7 @@ public class CategoriaService {
 	
 	@Transactional
 	public CategoriaResponseDTO adicionar(CategoriaRequestDTO categoriaRequest){
+		unique(categoriaRequest, 0L);
 		Categoria categoriaModel = mapper.map(categoriaRequest, Categoria.class);
 		categoriaModel = categoriaRepository.save(categoriaModel);
 
@@ -100,6 +101,7 @@ public class CategoriaService {
 	
 	@Transactional
 	public CategoriaResponseDTO atualizar(Long id, CategoriaRequestDTO categoriaRequest){
+		unique(categoriaRequest, id);
 		var categoriaRegistro = obterPorIdADMIN(id);
 		Categoria categoriaModel = mapper.map(categoriaRequest, Categoria.class);
 		categoriaModel.setId(id);
@@ -170,5 +172,6 @@ public class CategoriaService {
 				throw new ResourceConflict("O nome da categoria já existe");
 			} 
 		}
+		
 	}
 }

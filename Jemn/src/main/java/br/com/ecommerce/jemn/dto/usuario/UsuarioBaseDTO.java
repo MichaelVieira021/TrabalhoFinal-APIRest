@@ -40,5 +40,4 @@ public abstract class UsuarioBaseDTO {
     public void setPerfil(ETipoPerfil perfil) {
         this.perfil = perfil;
     }
-
 }

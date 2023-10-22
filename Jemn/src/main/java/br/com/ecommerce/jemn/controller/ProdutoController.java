@@ -104,10 +104,12 @@ public class ProdutoController {
 	@PostMapping
 	@PreAuthorize("hasAuthority('ADMIN')")
 	public ResponseEntity<ProdutoResponseDTO> adicionar(@RequestBody ProdutoRequestDTO produtoRequest){
-		produtoService.unique(produtoRequest, 0L);
-		if(produtoRequest.getNomeProduto().length() > 20){
-			throw new  ResourceUnprocessableEntity("Limite de caracteres excedido, MAX:20");
+		if(produtoRequest.getNomeProduto() == null || produtoRequest.getNomeProduto().length() < 1){
+			throw new  ResourceBadRequestException("Nome do produto não pode estar vazio.");
+		} else if(produtoRequest.getNomeProduto().length() > 25){
+				throw new  ResourceUnprocessableEntity("Limite de caracteres excedido, MAX:25");
 		}
+
 		if(produtoRequest.getQtdProduto() < 0 || produtoRequest.getVlProduto() < 0) {
 			throw new ResourceBadRequestException("Registros negativos não são permitidos.");
 		}
@@ -123,10 +125,12 @@ public class ProdutoController {
 	@PutMapping("/{id}")
 	@PreAuthorize("hasAuthority('ADMIN')")
 	public ResponseEntity<ProdutoResponseDTO> atualizar(@PathVariable Long id, @RequestBody ProdutoRequestDTO produtoRequest){
-		produtoService.unique(produtoRequest, id);
-		if(produtoRequest.getNomeProduto().length() > 20){
-			throw new  ResourceUnprocessableEntity("Limite de caracteres excedido, MAX:20");
+		if(produtoRequest.getNomeProduto() == null || produtoRequest.getNomeProduto().length() < 1){
+			throw new  ResourceBadRequestException("Nome do produto não pode estar vazio.");
+		} else if(produtoRequest.getNomeProduto().length() > 25){
+				throw new  ResourceUnprocessableEntity("Limite de caracteres excedido, MAX:25");
 		}
+
 		if(produtoRequest.getQtdProduto() < 0 || produtoRequest.getVlProduto() < 0) {
 			throw new ResourceBadRequestException("Registros negativos não são permitidos.");
 		}
@@ -153,7 +157,7 @@ public class ProdutoController {
 	@ApiResponse(responseCode = "500", description = "Erro ao realizar busca dos Dados por ID")
 	@PutMapping("/ativar/{id}")
 	@PreAuthorize("hasAuthority('ADMIN')")
-	public ResponseEntity<ProdutoResponseDTO> ativar(@PathVariable Long id, @RequestBody ProdutoRequestDTO categoriaRequest){
+	public ResponseEntity<ProdutoResponseDTO> ativar(@PathVariable Long id){
 		return ResponseEntity.status(200).body(produtoService.ativar(id));
 	}
 	
@@ -164,7 +168,7 @@ public class ProdutoController {
 	@ApiResponse(responseCode = "500", description = "Erro ao realizar busca dos Dados por ID")
 	@PutMapping("/desativar/{id}")
 	@PreAuthorize("hasAuthority('ADMIN')")
-	public ResponseEntity<ProdutoResponseDTO> desativar(@PathVariable Long id, @RequestBody ProdutoRequestDTO categoriaRequest){
+	public ResponseEntity<ProdutoResponseDTO> desativar(@PathVariable Long id){
 		return ResponseEntity.status(200).body(produtoService.desativar(id));
 	}
 	

@@ -5,14 +5,12 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
-
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
-
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -31,7 +29,7 @@ public class Usuario implements UserDetails{
     @Column(nullable = false, unique = true)
     private String email;
 
-    @Column(nullable = false, length = 15)
+    @Column(nullable = false)
     private String senha;
 
     @Column(nullable = false, unique = true, length = 14)

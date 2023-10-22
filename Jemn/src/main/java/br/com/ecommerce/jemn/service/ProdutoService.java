@@ -21,6 +21,8 @@ import br.com.ecommerce.jemn.dto.produto.ProdutoRequestDTO;
 import br.com.ecommerce.jemn.dto.produto.ProdutoResponseDTO;
 import br.com.ecommerce.jemn.model.ETipoEntidade;
 import br.com.ecommerce.jemn.model.Log;
+import br.com.ecommerce.jemn.model.Pedido;
+import br.com.ecommerce.jemn.model.PedidoItem;
 import br.com.ecommerce.jemn.model.Produto;
 import br.com.ecommerce.jemn.model.Usuario;
 import br.com.ecommerce.jemn.model.exceptions.ResourceBadRequestException;
@@ -177,9 +179,9 @@ public class ProdutoService {
 	}
 
 	@Transactional
-    public ProdutoResponseDTO atualizarQtd(ProdutoResponseDTO produtoRequest, PedidoItemResponseDTO pedidoItemResponse){
+    public ProdutoResponseDTO atualizarQtd(PedidoItemResponseDTO pedidoItemResponse){
         var produtoRegistro = obterPorId(pedidoItemResponse.getProduto().getId());
-        Produto produtoModel = mapper.map(produtoRequest, Produto.class);
+        Produto produtoModel = mapper.map(pedidoItemResponse.getProduto(), Produto.class);
         produtoModel.setQtdProduto(produtoModel.getQtdProduto() - pedidoItemResponse.getQtdPedidoitem());
         produtoModel = produtoRepository.save(produtoModel);
 
@@ -200,6 +202,36 @@ public class ProdutoService {
             throw new RuntimeException("Ocorreu um erro ao atualizar o produto: " + e.getMessage());
         }
         return mapper.map(produtoModel, ProdutoResponseDTO.class);
+    }
+	
+	@Transactional
+    public Pedido restaurarQtd(Pedido pedidoAnterior){
+		
+		for(PedidoItem pdItemAnterior : pedidoAnterior.getPedidoItens()){
+			ProdutoResponseDTO produtoRegistro = obterPorId(pdItemAnterior.getProduto().getId());
+
+			pdItemAnterior.getProduto().setQtdProduto(pdItemAnterior.getProduto().getQtdProduto() + pdItemAnterior.getQtdPedidoitem());;
+			Produto produtoModel = mapper.map(pdItemAnterior.getProduto(), Produto.class);
+			produtoModel = produtoRepository.save(produtoModel);
+			
+			try {
+            Usuario usuario = (Usuario) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+			
+            Log log = new Log(
+            ETipoEntidade.PRODUTO,
+            "ATUALIZACAO", 
+            new ObjectMapper().writeValueAsString(produtoRegistro),
+            new ObjectMapper().writeValueAsString(produtoModel),
+            usuario
+            );
+
+            logService.registrarLog(log);
+
+        } catch (Exception e) {
+            throw new RuntimeException("Ocorreu um erro ao atualizar o produto: " + e.getMessage());
+        }
+		}
+        return pedidoAnterior;
     }
 	
 	public void catEmUso(Long id) {

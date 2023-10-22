@@ -17,6 +17,7 @@ import br.com.ecommerce.jemn.dto.usuario.UsuarioRequestDTO;
 import br.com.ecommerce.jemn.dto.usuario.UsuarioResponseDTO;
 import br.com.ecommerce.jemn.model.ETipoPerfil;
 import br.com.ecommerce.jemn.model.Usuario;
+import br.com.ecommerce.jemn.model.exceptions.ResourceBadRequestException;
 import br.com.ecommerce.jemn.model.exceptions.ResourceConflict;
 import br.com.ecommerce.jemn.repository.UsuarioRepository;
 import br.com.ecommerce.jemn.security.JWTService;
@@ -98,14 +99,18 @@ public class UsuarioService {
     }
 
     public UsuarioLoginResponseDTO logar(String email, String senha){
-        Authentication autenticacao = authenticationManager
-            .authenticate(new UsernamePasswordAuthenticationToken(email, senha,Collections.emptyList()));
-            
-        SecurityContextHolder.getContext().setAuthentication(autenticacao);
-        String token =  BEARER + jwtService.gerarToken(autenticacao);
-        UsuarioResponseDTO usuarioResponse = obterPorEmail(email);
+		try{
+			Authentication autenticacao = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(email, senha,Collections.emptyList()));
+		
+			SecurityContextHolder.getContext().setAuthentication(autenticacao);
+			String token =  BEARER + jwtService.gerarToken(autenticacao);
+			UsuarioResponseDTO usuarioResponse = obterPorEmail(email);
+			return new UsuarioLoginResponseDTO(token, usuarioResponse);
+
+		} catch (RuntimeException e){
+			throw new ResourceBadRequestException("E-mail ou senha incorretos.");
+		}
         
-        return new UsuarioLoginResponseDTO(token, usuarioResponse);
     }
     
 	public void uniqueEMAILeTEL(UsuarioRequestDTO usuarioRequest, Long id){

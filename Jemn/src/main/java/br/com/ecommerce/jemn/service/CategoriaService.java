@@ -155,7 +155,8 @@ public class CategoriaService {
 				"DELETE",
 				"",
 				new ObjectMapper().writeValueAsString(registroDelete),
-				usuario);
+				usuario
+				);
 
 				logService.registrarLog(log);
 			

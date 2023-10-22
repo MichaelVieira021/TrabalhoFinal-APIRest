@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import br.com.ecommerce.jemn.dto.pedidoItem.PedidoItemRequestDTO;
 import br.com.ecommerce.jemn.dto.pedidoItem.PedidoItemResponseDTO;
+import br.com.ecommerce.jemn.model.Pedido;
 import br.com.ecommerce.jemn.model.PedidoItem;
 import br.com.ecommerce.jemn.repository.PedidoItemRepository;
 
@@ -55,5 +56,12 @@ public class PedidoItemService {
 	public void deletar(Long id) {
 		obterPorId(id);
 		pedidoItemRepository.deleteById(id);
+	}
+
+	public void deletarAllDePedido(Pedido pedido){
+		List<PedidoItem> pdIExcluir = pedidoItemRepository.findByPedido(pedido);
+		for(PedidoItem pdI : pdIExcluir){
+			deletar(pdI.getId());
+		}
 	}
 }

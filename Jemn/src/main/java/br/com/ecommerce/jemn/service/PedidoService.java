@@ -8,18 +8,24 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
 import br.com.ecommerce.jemn.dto.pedido.PedidoRequestDTO;
 import br.com.ecommerce.jemn.dto.pedido.PedidoResponseDTO;
 import br.com.ecommerce.jemn.dto.pedidoItem.PedidoItemRequestDTO;
 import br.com.ecommerce.jemn.dto.pedidoItem.PedidoItemResponseDTO;
 import br.com.ecommerce.jemn.dto.produto.ProdutoResponseDTO;
 import br.com.ecommerce.jemn.dto.usuario.UsuarioResponseDTO;
+import br.com.ecommerce.jemn.model.ETipoEntidade;
 import br.com.ecommerce.jemn.model.FormaPagamento;
+import br.com.ecommerce.jemn.model.Log;
 import br.com.ecommerce.jemn.model.Pedido;
 import br.com.ecommerce.jemn.model.PedidoItem;
+import br.com.ecommerce.jemn.model.Usuario;
 import br.com.ecommerce.jemn.model.email.Email;
 import br.com.ecommerce.jemn.model.exceptions.ResourceBadRequestException;
 import br.com.ecommerce.jemn.repository.PedidoRepository;
@@ -38,6 +44,9 @@ public class PedidoService {
 	
 	@Autowired
 	private ProdutoService produtoService;
+
+	@Autowired
+	private LogService logService;
 	
 	@Autowired
 	private PedidoItemService pedidoItemService;
@@ -74,16 +83,70 @@ public class PedidoService {
 		
 		formaPagamento(pedidoModel);
 		pedidoModel = pedidoRepository.save(pedidoModel);
-		envioDeEmail(pedidoModel);
+		Log log;
+		try{
+			Usuario usuario = (Usuario) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+			
+			log = new Log(
+				ETipoEntidade.PEDIDO,
+				"PEDIDO ADD",
+				"",
+				new ObjectMapper().writeValueAsString(mapper.map(pedidoModel, PedidoResponseDTO.class)),
+				usuario
+				);
+				
+				logService.registrarLog(log);
+				
+			}catch(Exception e){
+				throw new RuntimeException("Ocorreu um erro ao deletar a categoria: " + e.getMessage());
+			}
 		
+		pedidoModel.setDtPedido(log.getData());
+		pedidoModel = pedidoRepository.save(pedidoModel);
+		envioDeEmail(pedidoModel);
+
 		return mapper.map(pedidoModel, PedidoResponseDTO.class);
 	}
 
+	@Transactional
 	public PedidoResponseDTO atualizar(Long id, PedidoRequestDTO pedidoRequest){
-		obterPorId(id);
+		var teste = obterPorId(id);
 		Pedido pedidoModel = mapper.map(pedidoRequest, Pedido.class);
 		pedidoModel.setId(id);
+
+		//PedidoResponseDTO RegistroAntesDoPedido = mapper.map(logService.getRegistro(pedidoModel.getDtPedido()), PedidoResponseDTO.class);
+		//logService.getRegistro(teste.getDtPedido());
+		Pedido teste2 = mapper.map(logService.getRegistro(teste.getDtPedido()), Pedido.class);
+		produtoService.restaurarQtd(teste2);
+
+		pedidoItemService.deletarAllDePedido(mapper.map(teste, Pedido.class));
+
+		List<PedidoItem> pedidoItens = atualizarPedidoItens(pedidoRequest.getPedidoItens(), pedidoModel);
+		pedidoModel.setPedidoItens(pedidoItens);
+
+		formaPagamento(pedidoModel);
+
+		Log log;
+		try{
+			Usuario usuario = (Usuario) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+			
+			log = new Log(
+				ETipoEntidade.PEDIDO,
+				"PEDIDO ADD",
+				"",
+				new ObjectMapper().writeValueAsString(mapper.map(pedidoModel, PedidoResponseDTO.class)),
+				usuario
+				);
+				
+				logService.registrarLog(log);
+				
+			}catch(Exception e){
+				throw new RuntimeException("Ocorreu um erro ao deletar a categoria: " + e.getMessage());
+			}
+		
+		pedidoModel.setDtPedido(log.getData());
 		pedidoModel = pedidoRepository.save(pedidoModel);
+		envioDeEmail(pedidoModel);
 		
 		return mapper.map(pedidoModel, PedidoResponseDTO.class);
 	}
@@ -121,6 +184,38 @@ public class PedidoService {
         }
         return prAdicionados;	
     }
+
+	    private List<PedidoItem> atualizarPedidoItens(List<PedidoItemRequestDTO> pedidoItemRequest, Pedido pedidoModel){
+        List<PedidoItem> prAdicionados = new ArrayList<>();
+
+
+        for(PedidoItemRequestDTO pdoItemRequest : pedidoItemRequest){
+        	PedidoItemResponseDTO pedidoItemResponse = mapper.map(pdoItemRequest, PedidoItemResponseDTO.class);
+        	pedidoItemResponse.setPedido(mapper.map(pedidoModel, PedidoResponseDTO.class));
+        	
+        	ProdutoResponseDTO prResponse = produtoService.obterPorId(pedidoItemResponse.getProduto().getId());	
+        	pedidoItemResponse.setProduto(prResponse);
+
+			controleEstoque(pedidoItemResponse);
+			
+			double vlTotalBruto = pedidoItemResponse.getProduto().getVlProduto() * pedidoItemResponse.getQtdPedidoitem();
+			//PROMOÇÃO ATACADISTA
+			if (pedidoItemResponse.getQtdPedidoitem() >= 5){
+				pedidoItemResponse.setDescontoItem(vlTotalBruto * 0.05);
+				pedidoModel.setDescontoPedido(pedidoModel.getDescontoPedido() + pedidoItemResponse.getDescontoItem());
+			}
+
+			double vlTotalItem = vlTotalBruto - pedidoItemResponse.getDescontoItem() + pedidoItemResponse.getAcrecimoItem();
+        	pedidoItemResponse.setVltotalItem(vlTotalItem);
+        	pedidoModel.setVltotalPedido(pedidoModel.getVltotalPedido()+vlTotalItem);
+        
+			pedidoItemResponse =  pedidoItemService.adicionar(mapper.map(pedidoItemResponse, PedidoItemRequestDTO.class));
+
+        	prAdicionados.add(mapper.map(pedidoItemResponse, PedidoItem.class));
+        }
+		
+        return prAdicionados;
+    }
 	
     private void controleEstoque(PedidoItemResponseDTO pedidoItemResponse){
 		if (pedidoItemResponse.getQtdPedidoitem() < 1){
@@ -128,7 +223,7 @@ public class PedidoService {
 		}else if(pedidoItemResponse.getQtdPedidoitem() > pedidoItemResponse.getProduto().getQtdProduto() ) {
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Quantidade solicitada é maior que a quantidade em estoque");
 		}else{
-			produtoService.atualizarQtd(pedidoItemResponse.getProduto(), pedidoItemResponse);
+			produtoService.atualizarQtd(pedidoItemResponse);
 		}
 	}
 

@@ -17,15 +17,18 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 import br.com.ecommerce.jemn.dto.produto.ProdutoRequestDTO;
 import br.com.ecommerce.jemn.dto.produto.ProdutoResponseDTO;
+import br.com.ecommerce.jemn.model.exceptions.ResourceBadRequestException;
 import br.com.ecommerce.jemn.model.exceptions.ResourceUnprocessableEntity;
 import br.com.ecommerce.jemn.service.ProdutoService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
 @RestController
 @RequestMapping("/ecommerce/produtos")
 @Tag(name = "Produto")
+@SecurityRequirement(name = "bearerAuth")
 public class ProdutoController {
 
 	@Autowired
@@ -102,8 +105,11 @@ public class ProdutoController {
 	@PreAuthorize("hasAuthority('ADMIN')")
 	public ResponseEntity<ProdutoResponseDTO> adicionar(@RequestBody ProdutoRequestDTO produtoRequest){
 		produtoService.unique(produtoRequest, 0L);
-		if(produtoRequest.getNomeProduto().length() > 25){
-			throw new  ResourceUnprocessableEntity("Limite de caracteres excedido, MAX:25");
+		if(produtoRequest.getNomeProduto().length() > 20){
+			throw new  ResourceUnprocessableEntity("Limite de caracteres excedido, MAX:20");
+		}
+		if(produtoRequest.getQtdProduto() < 0 || produtoRequest.getVlProduto() < 0) {
+			throw new ResourceBadRequestException("Registros negativos não são permitidos.");
 		}
 		
 		return ResponseEntity.status(201).body(produtoService.adicionar(produtoRequest));
@@ -118,8 +124,11 @@ public class ProdutoController {
 	@PreAuthorize("hasAuthority('ADMIN')")
 	public ResponseEntity<ProdutoResponseDTO> atualizar(@PathVariable Long id, @RequestBody ProdutoRequestDTO produtoRequest){
 		produtoService.unique(produtoRequest, id);
-		if(produtoRequest.getNomeProduto().length() > 25){
-			throw new  ResourceUnprocessableEntity("Limite de caracteres excedido, MAX:25");
+		if(produtoRequest.getNomeProduto().length() > 20){
+			throw new  ResourceUnprocessableEntity("Limite de caracteres excedido, MAX:20");
+		}
+		if(produtoRequest.getQtdProduto() < 0 || produtoRequest.getVlProduto() < 0) {
+			throw new ResourceBadRequestException("Registros negativos não são permitidos.");
 		}
 		
 		return ResponseEntity.status(200).body(produtoService.atualizar(id, produtoRequest));

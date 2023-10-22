@@ -20,12 +20,14 @@ import br.com.ecommerce.jemn.dto.usuario.UsuarioResponseDTO;
 import br.com.ecommerce.jemn.service.UsuarioService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
 @RestController
 @RequestMapping("/ecommerce/usuarios")
 @CrossOrigin("*")
 @Tag(name = "Usuario")
+@SecurityRequirement(name = "bearerAuth")
 public class UsuarioController {
 
 	@Autowired

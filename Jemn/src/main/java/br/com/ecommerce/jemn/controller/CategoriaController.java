@@ -19,11 +19,13 @@ import br.com.ecommerce.jemn.service.CategoriaService;
 import br.com.ecommerce.jemn.service.ProdutoService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
 @RestController
 @RequestMapping("/ecommerce/categorias")
 @Tag(name = "Categoria")
+@SecurityRequirement(name = "bearerAuth")
 public class CategoriaController {
 
 	@Autowired

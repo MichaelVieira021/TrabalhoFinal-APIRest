@@ -21,6 +21,7 @@ import br.com.ecommerce.jemn.model.FormaPagamento;
 import br.com.ecommerce.jemn.model.Pedido;
 import br.com.ecommerce.jemn.model.PedidoItem;
 import br.com.ecommerce.jemn.model.email.Email;
+import br.com.ecommerce.jemn.model.exceptions.ResourceBadRequestException;
 import br.com.ecommerce.jemn.repository.PedidoRepository;
 
 @Service
@@ -149,7 +150,11 @@ public class PedidoService {
 		String mensagem = gerarHTMLComDadosDosPedidos(pedido);	
 		
 		Email email = new Email("RESUMO PEDIDO JEMN", mensagem, "elton.medeiros14@gmail.com", destinatario);
+		try{
 		emailService.enviar(email);
+		} catch(Exception e){
+			throw new ResourceBadRequestException("E-mail remetente não configurado corretamente.");
+		}
         return ResponseEntity.status(200).body("E-mail enviado com sucesso!!!");
     }
 

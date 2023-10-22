@@ -16,11 +16,13 @@ import br.com.ecommerce.jemn.dto.pedidoItem.PedidoItemResponseDTO;
 import br.com.ecommerce.jemn.service.PedidoItemService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
 @RestController
 @RequestMapping("/ecommerce/pedidoItems")
 @Tag(name = "PedidoItem")
+@SecurityRequirement(name = "bearerAuth")
 public class PedidoItemController {
 
 	@Autowired

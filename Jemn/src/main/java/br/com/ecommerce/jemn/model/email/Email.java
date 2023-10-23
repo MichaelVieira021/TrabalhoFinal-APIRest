@@ -7,8 +7,6 @@ public class Email {
     private String remetente;
     private String destinatario;
 
-    
-
     public Email(String assunto, String mensagem, String remetente, String destinatario) {
         this.assunto = assunto;
         this.mensagem = mensagem;
@@ -50,6 +48,4 @@ public class Email {
     public void setDestinatario(String destinatario) {
         this.destinatario = destinatario;
     }
-
-
 }

@@ -10,7 +10,9 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import br.com.ecommerce.jemn.common.ConversorData;
 import br.com.ecommerce.jemn.model.error.ErrorResposta;
 import br.com.ecommerce.jemn.model.exceptions.ResourceBadRequestException;
+import br.com.ecommerce.jemn.model.exceptions.ResourceConflict;
 import br.com.ecommerce.jemn.model.exceptions.ResourceNotFoundException;
+import br.com.ecommerce.jemn.model.exceptions.ResourceUnprocessableEntity;
 
 @ControllerAdvice
 public class RestExceptionHandler {
@@ -64,4 +66,25 @@ public class RestExceptionHandler {
 
         return new ResponseEntity<>(erro, HttpStatus.FORBIDDEN);
     }
+
+    @ExceptionHandler(ResourceUnprocessableEntity.class)
+    public ResponseEntity<ErrorResposta> handlerUnprocessableEntity(ResourceUnprocessableEntity ex){
+
+        String data = ConversorData.converterDateParaDataHora(new Date());
+
+        ErrorResposta erro = new ErrorResposta(422, "Unprocessable Content", ex.getMessage(), data);
+
+        return new ResponseEntity<>(erro, HttpStatus.UNPROCESSABLE_ENTITY);
+    }
+
+    @ExceptionHandler(ResourceConflict.class)
+    public ResponseEntity<ErrorResposta> handlerResourceConflict(ResourceConflict ex){
+
+        String data = ConversorData.converterDateParaDataHora(new Date());
+
+        ErrorResposta erro = new ErrorResposta(409, "Conflict", ex.getMessage(), data);
+
+        return new ResponseEntity<>(erro, HttpStatus.CONFLICT);
+    }
+
 }

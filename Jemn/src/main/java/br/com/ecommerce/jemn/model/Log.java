@@ -37,7 +37,7 @@ public class Log {
     @JoinColumn(name = "idUsuario", nullable = false)
     @JsonBackReference
     private Usuario usuario;
-    
+
     public Log(ETipoEntidade tipo, String acao,String vlOriginal, String vlAtual,Usuario usuario) {
         this.tipo = tipo;
         this.acao = acao;
@@ -46,6 +46,8 @@ public class Log {
         this.vlAtual = vlAtual;
         this.usuario = usuario;
     }
+
+    public Log(){}
 
     public Long getId() {
         return Id;

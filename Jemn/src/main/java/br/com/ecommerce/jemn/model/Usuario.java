@@ -5,14 +5,12 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
-
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
-
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -20,13 +18,12 @@ import org.springframework.security.core.userdetails.UserDetails;
 @Entity
 public class Usuario implements UserDetails{
     
-    //#region propriedades
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "idUsuario")
     private Long id;
 
-    @Column(nullable = false)
+    @Column(nullable = false, length = 15)
     private String nomeUsuario;
 
     @Column(nullable = false, unique = true)
@@ -35,7 +32,7 @@ public class Usuario implements UserDetails{
     @Column(nullable = false)
     private String senha;
 
-    @Column(nullable = false, unique = true)
+    @Column(nullable = false, unique = true, length = 14)
     private String telefone;
 
     @Column(nullable = false)
@@ -47,10 +44,8 @@ public class Usuario implements UserDetails{
     @OneToMany(mappedBy = "usuario")
     private List<Log> logs;
 
-    @Column
+    @Column(nullable = false)
     private ETipoPerfil perfil;
-    //#endregion propriedades
-
     
     public Usuario(Date dtCadastro) {
         this.dtCadastro = new Date();
@@ -113,8 +108,6 @@ public class Usuario implements UserDetails{
     public void setPerfil(ETipoPerfil perfil) {
         this.perfil = perfil;
     }
-    
-    //#endregion
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

@@ -12,11 +12,13 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-
 import br.com.ecommerce.jemn.dto.usuario.UsuarioLoginResponseDTO;
 import br.com.ecommerce.jemn.dto.usuario.UsuarioRequestDTO;
 import br.com.ecommerce.jemn.dto.usuario.UsuarioResponseDTO;
+import br.com.ecommerce.jemn.model.ETipoPerfil;
 import br.com.ecommerce.jemn.model.Usuario;
+import br.com.ecommerce.jemn.model.exceptions.ResourceBadRequestException;
+import br.com.ecommerce.jemn.model.exceptions.ResourceConflict;
 import br.com.ecommerce.jemn.repository.UsuarioRepository;
 import br.com.ecommerce.jemn.security.JWTService;
 
@@ -60,6 +62,7 @@ public class UsuarioService {
 	}
 	
 	public UsuarioResponseDTO adicionar(UsuarioRequestDTO usuarioRequest){
+		uniqueEMAILeTEL(usuarioRequest, 0L);
 		Usuario usuarioModel = mapper.map(usuarioRequest, Usuario.class);
         String senha =  passwordEncoder.encode(usuarioModel.getSenha());
 		usuarioModel.setSenha(senha);
@@ -69,9 +72,12 @@ public class UsuarioService {
 	}
 	
 	public UsuarioResponseDTO atualizar(Long id, UsuarioRequestDTO usuarioRequest){
+		uniqueEMAILeTEL(usuarioRequest, id);
 		obterPorId(id);
 		Usuario usuarioModel = mapper.map(usuarioRequest, Usuario.class);
 		usuarioModel.setId(id);
+		String senha =  passwordEncoder.encode(usuarioModel.getSenha());
+		usuarioModel.setSenha(senha);
 		usuarioModel = usuarioRepository.save(usuarioModel);
 		
 		return mapper.map(usuarioModel, UsuarioResponseDTO.class);
@@ -93,13 +99,39 @@ public class UsuarioService {
     }
 
     public UsuarioLoginResponseDTO logar(String email, String senha){
-        Authentication autenticacao = authenticationManager
-            .authenticate(new UsernamePasswordAuthenticationToken(email, senha,Collections.emptyList()));
-            
-        SecurityContextHolder.getContext().setAuthentication(autenticacao);
-        String token =  BEARER + jwtService.gerarToken(autenticacao);
-        UsuarioResponseDTO usuarioResponse = obterPorEmail(email);
+		try{
+			Authentication autenticacao = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(email, senha,Collections.emptyList()));
+		
+			SecurityContextHolder.getContext().setAuthentication(autenticacao);
+			String token =  BEARER + jwtService.gerarToken(autenticacao);
+			UsuarioResponseDTO usuarioResponse = obterPorEmail(email);
+			return new UsuarioLoginResponseDTO(token, usuarioResponse);
+
+		} catch (RuntimeException e){
+			throw new ResourceBadRequestException("E-mail ou senha incorretos.");
+		}
         
-        return new UsuarioLoginResponseDTO(token, usuarioResponse);
     }
+    
+	public void uniqueEMAILeTEL(UsuarioRequestDTO usuarioRequest, Long id){
+		List<UsuarioResponseDTO> listaUsuarioResponse = obterTodos();
+
+		for (UsuarioResponseDTO usuarioResponse : listaUsuarioResponse){
+			if(usuarioResponse.getEmail().equals(usuarioRequest.getEmail()) && usuarioResponse.getId() != id){
+				throw new ResourceConflict("E-mail já cadastrado!");
+			}else if (usuarioResponse.getTelefone().equals(usuarioRequest.getTelefone()) && usuarioResponse.getId() != id) {
+				throw new ResourceConflict("Telefone já cadastrado!");
+			}
+		}
+	}
+
+	public boolean verificaPerfil(ETipoPerfil p){
+		for(ETipoPerfil tpP : ETipoPerfil.values()){
+			if(p.compareTo(tpP) == 0){
+				return true;
+			}
+		}
+		return false;
+	}
+
 }

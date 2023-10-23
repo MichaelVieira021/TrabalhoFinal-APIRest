@@ -16,7 +16,7 @@ public class Categoria {
     @Column(name = "idCategoria")
     private Long id;
 
-    @Column(nullable = false, length = 25)
+    @Column(nullable = false, unique = true, length = 25)
     private String nomeCategoria;
 
     @Column(nullable = true)
@@ -58,8 +58,5 @@ public class Categoria {
 
     public void setAtivo(boolean ativo) {
         this.ativo = ativo;
-    }
-
-    
-    
+    }  
 }

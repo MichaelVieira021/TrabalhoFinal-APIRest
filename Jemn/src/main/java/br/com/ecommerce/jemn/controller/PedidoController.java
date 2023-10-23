@@ -16,63 +16,72 @@ import org.springframework.web.bind.annotation.RestController;
 
 import br.com.ecommerce.jemn.dto.pedido.PedidoRequestDTO;
 import br.com.ecommerce.jemn.dto.pedido.PedidoResponseDTO;
+import br.com.ecommerce.jemn.model.exceptions.ResourceBadRequestException;
 import br.com.ecommerce.jemn.service.PedidoService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
 @RestController
 @RequestMapping("/ecommerce/pedidos")
 @Tag(name = "Pedido")
+@SecurityRequirement(name = "bearerAuth")
 public class PedidoController {
 
 	@Autowired
 	private PedidoService pedidoService;
 
 	@Operation(summary = "Pesquisa e traz todos os pedidos cadastrado ", method = "GET", description = "Metodo criado somente para o ADMIN ")
-		@ApiResponse(responseCode = "200", description = "Busca por ID realizada com sucesso")
-		@ApiResponse(responseCode = "422", description = "Dados de requisição inválidos")
-		@ApiResponse(responseCode = "400", description = "Paramentros inválidos")
-		@ApiResponse(responseCode = "500", description = "Erro ao realizar busca dos Dados por ID")
+	@ApiResponse(responseCode = "200", description = "Busca por ID realizada com sucesso")
+	@ApiResponse(responseCode = "422", description = "Dados de requisição inválidos")
+	@ApiResponse(responseCode = "400", description = "Paramentros inválidos")
+	@ApiResponse(responseCode = "500", description = "Erro ao realizar busca dos Dados por ID")
 	@GetMapping
 	@PreAuthorize("hasAuthority('ADMIN')")
 	public ResponseEntity<List<PedidoResponseDTO>> obterTodos(){
 		return ResponseEntity.ok(pedidoService.obterTodos());
 	}
 	@Operation(summary = "Pesquisa e traz por Id pedidos cadastrado ", method = "GET", description = "Metodo criado somente para o ADMIN ")
-		@ApiResponse(responseCode = "200", description = "Busca por ID realizada com sucesso")
-		@ApiResponse(responseCode = "422", description = "Dados de requisição inválidos")
-		@ApiResponse(responseCode = "400", description = "Paramentros inválidos")
-		@ApiResponse(responseCode = "500", description = "Erro ao realizar busca dos Dados por ID")
+	@ApiResponse(responseCode = "200", description = "Busca por ID realizada com sucesso")
+	@ApiResponse(responseCode = "422", description = "Dados de requisição inválidos")
+	@ApiResponse(responseCode = "400", description = "Paramentros inválidos")
+	@ApiResponse(responseCode = "500", description = "Erro ao realizar busca dos Dados por ID")
 	@GetMapping("/{id}")
 	@PreAuthorize("hasAuthority('ADMIN')")
 	public ResponseEntity<PedidoResponseDTO> obterPorId(@PathVariable Long id){
 		return ResponseEntity.ok(pedidoService.obterPorId(id));
 	}
 	@Operation(summary = "Cria um novo pedido ", method = "POST", description = "Metodo permitido para usuarios com autenticação ")
-		@ApiResponse(responseCode = "200", description = "Busca por ID realizada com sucesso")
-		@ApiResponse(responseCode = "422", description = "Dados de requisição inválidos")
-		@ApiResponse(responseCode = "400", description = "Paramentros inválidos")
-		@ApiResponse(responseCode = "500", description = "Erro ao realizar busca dos Dados por ID")
+	@ApiResponse(responseCode = "200", description = "Busca por ID realizada com sucesso")
+	@ApiResponse(responseCode = "422", description = "Dados de requisição inválidos")
+	@ApiResponse(responseCode = "400", description = "Paramentros inválidos")
+	@ApiResponse(responseCode = "500", description = "Erro ao realizar busca dos Dados por ID")
 	@PostMapping
 	public ResponseEntity<PedidoResponseDTO> adicionar(@RequestBody PedidoRequestDTO pedidoRequest){
+		if(pedidoRequest.getFormaPg() == null){
+			throw new  ResourceBadRequestException("Forma de pagamento não encontrada.");
+		}
 		return ResponseEntity.status(201).body(pedidoService.adicionar(pedidoRequest));
 	}
 	@Operation(summary = "Atualiza um pedido cadastrado ", method = "PUT", description = "Metodo criado somente para o ADMIN ")
-		@ApiResponse(responseCode = "200", description = "Busca por ID realizada com sucesso")
-		@ApiResponse(responseCode = "422", description = "Dados de requisição inválidos")
-		@ApiResponse(responseCode = "400", description = "Paramentros inválidos")
-		@ApiResponse(responseCode = "500", description = "Erro ao realizar busca dos Dados por ID")
+	@ApiResponse(responseCode = "200", description = "Busca por ID realizada com sucesso")
+	@ApiResponse(responseCode = "422", description = "Dados de requisição inválidos")
+	@ApiResponse(responseCode = "400", description = "Paramentros inválidos")
+	@ApiResponse(responseCode = "500", description = "Erro ao realizar busca dos Dados por ID")
 	@PutMapping("/{id}")
 	@PreAuthorize("hasAuthority('ADMIN')")
 	public ResponseEntity<PedidoResponseDTO> atualizar(@PathVariable Long id, @RequestBody PedidoRequestDTO pedidoRequest){
+		if(pedidoRequest.getFormaPg() == null){
+			throw new  ResourceBadRequestException("Forma de pagamento não encontrada.");
+		}
 		return ResponseEntity.status(200).body(pedidoService.atualizar(id, pedidoRequest));
 	}
 	@Operation(summary = "Deleta um pedido cadastrado ", method = "DELETE", description = "Metodo criado somente para o ADMIN ")
-		@ApiResponse(responseCode = "200", description = "Busca por ID realizada com sucesso")
-		@ApiResponse(responseCode = "422", description = "Dados de requisição inválidos")
-		@ApiResponse(responseCode = "400", description = "Paramentros inválidos")
-		@ApiResponse(responseCode = "500", description = "Erro ao realizar busca dos Dados por ID")
+	@ApiResponse(responseCode = "200", description = "Busca por ID realizada com sucesso")
+	@ApiResponse(responseCode = "422", description = "Dados de requisição inválidos")
+	@ApiResponse(responseCode = "400", description = "Paramentros inválidos")
+	@ApiResponse(responseCode = "500", description = "Erro ao realizar busca dos Dados por ID")
 	@DeleteMapping("/{id}")
 	@PreAuthorize("hasAuthority('ADMIN')")
 	public ResponseEntity<?> deletar(@PathVariable Long id){

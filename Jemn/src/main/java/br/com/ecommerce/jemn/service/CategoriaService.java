@@ -16,6 +16,7 @@ import br.com.ecommerce.jemn.model.Categoria;
 import br.com.ecommerce.jemn.model.ETipoEntidade;
 import br.com.ecommerce.jemn.model.Log;
 import br.com.ecommerce.jemn.model.Usuario;
+import br.com.ecommerce.jemn.model.exceptions.ResourceConflict;
 import br.com.ecommerce.jemn.repository.CategoriaRepository;
 
 @Service
@@ -30,7 +31,7 @@ public class CategoriaService {
 	@Autowired
 	private LogService logService;
 	
-	public List<CategoriaResponseDTO> obterTodos(){	
+	public List<CategoriaResponseDTO> obterTodos(){
 		
 		List<Categoria> categorias = categoriaRepository.findAll(Sort.by(Sort.Order.asc("id")));
 
@@ -50,10 +51,10 @@ public class CategoriaService {
 		
 		return mapper.map(optCategoria.get(), CategoriaResponseDTO.class);
 	}
-	
+
 	
 	//APENAS ADMIN---------------------------------------------------------
-	public List<CategoriaResponseDTO> obterTodosADMIN(){	
+	public List<CategoriaResponseDTO> obterTodosADMIN(){
 		
 		List<Categoria> categorias = categoriaRepository.findAll(Sort.by(Sort.Order.asc("id")));
 
@@ -75,6 +76,7 @@ public class CategoriaService {
 	
 	@Transactional
 	public CategoriaResponseDTO adicionar(CategoriaRequestDTO categoriaRequest){
+		unique(categoriaRequest, 0L);
 		Categoria categoriaModel = mapper.map(categoriaRequest, Categoria.class);
 		categoriaModel = categoriaRepository.save(categoriaModel);
 
@@ -99,7 +101,8 @@ public class CategoriaService {
 	
 	@Transactional
 	public CategoriaResponseDTO atualizar(Long id, CategoriaRequestDTO categoriaRequest){
-		var categoriaRegistro = obterPorId(id);
+		unique(categoriaRequest, id);
+		var categoriaRegistro = obterPorIdADMIN(id);
 		Categoria categoriaModel = mapper.map(categoriaRequest, Categoria.class);
 		categoriaModel.setId(id);
 		categoriaModel.setAtivo(categoriaRegistro.isAtivo());
@@ -141,7 +144,7 @@ public class CategoriaService {
 	
 	@Transactional
 	public void deletar(Long id){
-		var registroDelete = obterPorId(id);
+		var registroDelete = obterPorIdADMIN(id);
 		categoriaRepository.deleteById(id);
 
 		try{
@@ -152,12 +155,24 @@ public class CategoriaService {
 				"DELETE",
 				"",
 				new ObjectMapper().writeValueAsString(registroDelete),
-				usuario);
+				usuario
+				);
 
 				logService.registrarLog(log);
 			
 		}catch(Exception e){
 			throw new RuntimeException("Ocorreu um erro ao deletar a categoria: " + e.getMessage());
 		}
+	}
+
+	public void unique(CategoriaRequestDTO categoriaRequest, Long id){
+		List<CategoriaResponseDTO> listaCategoriaResponse = obterTodosADMIN();
+		
+		for (CategoriaResponseDTO categoriaResponse : listaCategoriaResponse) {
+			if(categoriaResponse.getNomeCategoria().equals(categoriaRequest.getNomeCategoria()) && categoriaResponse.getId() != id){
+				throw new ResourceConflict("O nome da categoria já existe");
+			} 
+		}
+		
 	}
 }

@@ -72,6 +72,7 @@ public class ProdutoController {
 	@ApiResponse(responseCode = "400", description = "Paramentros inválidos")
 	@ApiResponse(responseCode = "500", description = "Erro ao realizar busca dos Dados por ID")
 	@GetMapping("/admin")
+	@PreAuthorize("hasAuthority('ADMIN')")
 	public ResponseEntity<List<ProdutoResponseDTO>> obterTodosADMIN(){
 		return ResponseEntity.ok(produtoService.obterTodosADMIN()); 
 	}
@@ -82,6 +83,7 @@ public class ProdutoController {
 	@ApiResponse(responseCode = "400", description = "Paramentros inválidos")
 	@ApiResponse(responseCode = "500", description = "Erro ao realizar busca dos Dados por ID")
 	@GetMapping("/admin/{id}")
+	@PreAuthorize("hasAuthority('ADMIN')")
 	public ResponseEntity<ProdutoResponseDTO> obterPorIdADMIN(@PathVariable Long id){
 		return ResponseEntity.ok(produtoService.obterPorIdADMIN(id));
 	}
@@ -92,6 +94,7 @@ public class ProdutoController {
 	@ApiResponse(responseCode = "400", description = "Paramentros inválidos")
 	@ApiResponse(responseCode = "500", description = "Erro ao realizar busca dos Dados por ID")
 	@GetMapping("/categoria/admin/{id}")
+	@PreAuthorize("hasAuthority('ADMIN')")
 	public ResponseEntity<List<ProdutoResponseDTO>> obterPorCategoriaADMIN(@PathVariable Long id){
 		return ResponseEntity.ok(produtoService.obterPorCategoriaADMIN(id));
 	}

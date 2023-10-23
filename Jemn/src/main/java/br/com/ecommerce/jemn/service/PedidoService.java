@@ -89,7 +89,7 @@ public class PedidoService {
 			
 			log = new Log(
 				ETipoEntidade.PEDIDO,
-				"PEDIDO ADD",
+				"PEDIDO ADICIONADO",
 				"",
 				new ObjectMapper().writeValueAsString(mapper.map(pedidoModel, PedidoResponseDTO.class)),
 				usuario
@@ -129,7 +129,7 @@ public class PedidoService {
 			
 			log = new Log(
 				ETipoEntidade.PEDIDO,
-				"PEDIDO ADD",
+				"PEDIDO ATUALIZADO",
 				"",
 				new ObjectMapper().writeValueAsString(mapper.map(pedidoModel, PedidoResponseDTO.class)),
 				usuario

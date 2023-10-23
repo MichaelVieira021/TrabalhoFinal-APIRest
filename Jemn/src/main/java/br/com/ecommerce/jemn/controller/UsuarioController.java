@@ -57,6 +57,19 @@ public class UsuarioController {
 		return ResponseEntity.ok(usuarioService.obterPorId(id));
 	}
 
+	@Operation(summary = "Pesquisa e traz por id um usuario cadastrado ", method = "GET", description = "Metodo criado somente para o ADMIN ")
+	@ApiResponse(responseCode = "200", description = "Busca por ID realizada com sucesso")
+	@ApiResponse(responseCode = "422", description = "Dados de requisição inválidos")
+	@ApiResponse(responseCode = "400", description = "Paramentros inválidos")
+	@ApiResponse(responseCode = "500", description = "Erro ao realizar busca dos Dados por ID")
+	@GetMapping("/email/{email}")
+	@PreAuthorize("hasAuthority('ADMIN')")
+	public ResponseEntity<UsuarioResponseDTO> obterPorEmail(@PathVariable String email){
+		return ResponseEntity.ok(usuarioService.obterPorEmail(email));
+	}
+
+	
+
 	@Operation(summary = "Adiciona novo usuario ", method = "POST", description = "Metodo criado para todos ")
 	@ApiResponse(responseCode = "200", description = "Busca por ID realizada com sucesso")
 	@ApiResponse(responseCode = "422", description = "Dados de requisição inválidos")

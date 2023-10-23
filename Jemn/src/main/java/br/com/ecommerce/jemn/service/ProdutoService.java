@@ -181,6 +181,7 @@ public class ProdutoService {
 	@Transactional
     public ProdutoResponseDTO atualizarQtd(PedidoItemResponseDTO pedidoItemResponse){
         var produtoRegistro = obterPorId(pedidoItemResponse.getProduto().getId());
+
         Produto produtoModel = mapper.map(pedidoItemResponse.getProduto(), Produto.class);
         produtoModel.setQtdProduto(produtoModel.getQtdProduto() - pedidoItemResponse.getQtdPedidoitem());
         produtoModel = produtoRepository.save(produtoModel);
@@ -210,8 +211,8 @@ public class ProdutoService {
 		for(PedidoItem pdItemAnterior : pedidoAnterior.getPedidoItens()){
 			ProdutoResponseDTO produtoRegistro = obterPorId(pdItemAnterior.getProduto().getId());
 
-			pdItemAnterior.getProduto().setQtdProduto(pdItemAnterior.getProduto().getQtdProduto() + pdItemAnterior.getQtdPedidoitem());;
-			Produto produtoModel = mapper.map(pdItemAnterior.getProduto(), Produto.class);
+			Produto produtoModel = mapper.map(produtoRegistro, Produto.class);
+			produtoModel.setQtdProduto(produtoModel.getQtdProduto() + pdItemAnterior.getQtdPedidoitem());
 			produtoModel = produtoRepository.save(produtoModel);
 			
 			try {

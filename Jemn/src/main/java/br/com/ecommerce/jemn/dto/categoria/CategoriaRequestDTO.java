@@ -6,8 +6,6 @@ public class CategoriaRequestDTO {
     private String obsCategoria;
     private boolean ativo;
     
-    
-
     public CategoriaRequestDTO() {
 		this.ativo = true;
 	}

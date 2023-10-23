@@ -12,7 +12,6 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
-
 import com.fasterxml.jackson.databind.ObjectMapper;
 import br.com.ecommerce.jemn.dto.pedido.PedidoRequestDTO;
 import br.com.ecommerce.jemn.dto.pedido.PedidoResponseDTO;
@@ -25,6 +24,7 @@ import br.com.ecommerce.jemn.model.FormaPagamento;
 import br.com.ecommerce.jemn.model.Log;
 import br.com.ecommerce.jemn.model.Pedido;
 import br.com.ecommerce.jemn.model.PedidoItem;
+import br.com.ecommerce.jemn.model.Produto;
 import br.com.ecommerce.jemn.model.Usuario;
 import br.com.ecommerce.jemn.model.email.Email;
 import br.com.ecommerce.jemn.model.exceptions.ResourceBadRequestException;
@@ -114,14 +114,11 @@ public class PedidoService {
 		Pedido pedidoModel = mapper.map(pedidoRequest, Pedido.class);
 		pedidoModel.setId(id);
 
-		//PedidoResponseDTO RegistroAntesDoPedido = mapper.map(logService.getRegistro(pedidoModel.getDtPedido()), PedidoResponseDTO.class);
-		//logService.getRegistro(teste.getDtPedido());
-		Pedido teste2 = mapper.map(logService.getRegistro(teste.getDtPedido()), Pedido.class);
-		produtoService.restaurarQtd(teste2);
+		produtoService.restaurarQtd(mapper.map(logService.getRegistro(teste.getDtPedido()), Pedido.class));
 
 		pedidoItemService.deletarAllDePedido(mapper.map(teste, Pedido.class));
 
-		List<PedidoItem> pedidoItens = atualizarPedidoItens(pedidoRequest.getPedidoItens(), pedidoModel);
+		List<PedidoItem> pedidoItens = adicionarPedidoItens(pedidoRequest.getPedidoItens(), pedidoModel);
 		pedidoModel.setPedidoItens(pedidoItens);
 
 		formaPagamento(pedidoModel);
@@ -160,13 +157,14 @@ public class PedidoService {
         List<PedidoItem> prAdicionados = new ArrayList<>();
 
         for(PedidoItemRequestDTO pdoItemRequest : pedidoItemRequest){
-        	PedidoItemResponseDTO pedidoItemResponse = mapper.map(pdoItemRequest, PedidoItemResponseDTO.class);
-        	pedidoItemResponse.setPedido(mapper.map(pedidoModel, PedidoResponseDTO.class));
+
+        	PedidoItem pedidoItemResponse = mapper.map(pdoItemRequest, PedidoItem.class);
+			pedidoItemResponse.setPedido(pedidoModel);
         	
         	ProdutoResponseDTO prResponse = produtoService.obterPorId(pedidoItemResponse.getProduto().getId());	
-        	pedidoItemResponse.setProduto(prResponse);
+        	pedidoItemResponse.setProduto(mapper.map(prResponse, Produto.class));
 
-			controleEstoque(pedidoItemResponse);
+			controleEstoque(mapper.map(pedidoItemResponse, PedidoItemResponseDTO.class));
 			
 			double vlTotalBruto = pedidoItemResponse.getProduto().getVlProduto() * pedidoItemResponse.getQtdPedidoitem();
 			//PROMOÇÃO ATACADISTA
@@ -179,42 +177,10 @@ public class PedidoService {
         	pedidoItemResponse.setVltotalItem(vlTotalItem);
         	pedidoModel.setVltotalPedido(pedidoModel.getVltotalPedido()+vlTotalItem);
         	
-        	pedidoItemResponse =  pedidoItemService.adicionar(mapper.map(pedidoItemResponse, PedidoItemRequestDTO.class));
-        	prAdicionados.add(mapper.map(pedidoItemResponse, PedidoItem.class));
+        	PedidoItemResponseDTO pdItemRes =  pedidoItemService.adicionar(mapper.map(pedidoItemResponse, PedidoItemRequestDTO.class));
+        	prAdicionados.add(mapper.map(pdItemRes, PedidoItem.class));
         }
         return prAdicionados;	
-    }
-
-	    private List<PedidoItem> atualizarPedidoItens(List<PedidoItemRequestDTO> pedidoItemRequest, Pedido pedidoModel){
-        List<PedidoItem> prAdicionados = new ArrayList<>();
-
-
-        for(PedidoItemRequestDTO pdoItemRequest : pedidoItemRequest){
-        	PedidoItemResponseDTO pedidoItemResponse = mapper.map(pdoItemRequest, PedidoItemResponseDTO.class);
-        	pedidoItemResponse.setPedido(mapper.map(pedidoModel, PedidoResponseDTO.class));
-        	
-        	ProdutoResponseDTO prResponse = produtoService.obterPorId(pedidoItemResponse.getProduto().getId());	
-        	pedidoItemResponse.setProduto(prResponse);
-
-			controleEstoque(pedidoItemResponse);
-			
-			double vlTotalBruto = pedidoItemResponse.getProduto().getVlProduto() * pedidoItemResponse.getQtdPedidoitem();
-			//PROMOÇÃO ATACADISTA
-			if (pedidoItemResponse.getQtdPedidoitem() >= 5){
-				pedidoItemResponse.setDescontoItem(vlTotalBruto * 0.05);
-				pedidoModel.setDescontoPedido(pedidoModel.getDescontoPedido() + pedidoItemResponse.getDescontoItem());
-			}
-
-			double vlTotalItem = vlTotalBruto - pedidoItemResponse.getDescontoItem() + pedidoItemResponse.getAcrecimoItem();
-        	pedidoItemResponse.setVltotalItem(vlTotalItem);
-        	pedidoModel.setVltotalPedido(pedidoModel.getVltotalPedido()+vlTotalItem);
-        
-			pedidoItemResponse =  pedidoItemService.adicionar(mapper.map(pedidoItemResponse, PedidoItemRequestDTO.class));
-
-        	prAdicionados.add(mapper.map(pedidoItemResponse, PedidoItem.class));
-        }
-		
-        return prAdicionados;
     }
 	
     private void controleEstoque(PedidoItemResponseDTO pedidoItemResponse){
